@@ -1,0 +1,26 @@
+<% new_form = action_name == "new" || action_name == "create" %>
+<%= form_tag new_form ? project_zones_path(@project) : project_zone_path(@project, params[:id]), method: new_form ? :post : :put do %>
+	
+	<div class="field">
+		<%= label_tag(:name, "Name") %><br>
+		<%= text_field_tag(:name, params[:name]) %>
+		<span>Lowercase alphanumeric and dashes (e.g. "example-name-123")</span>
+	</div>
+	
+	<div class="field">
+		<%= label_tag(:description, "Description") %><br>
+		<%= text_field_tag(:description, params[:description]) %>
+		<span>Free form, optional</span>
+	</div>
+	
+	<div class="field">
+		<%= label_tag(:dns_name, "DNS Name") %><br>
+		<%= text_field_tag(:dns_name, params[:dns_name]) %>
+		<span>The managed DNS domain, with ending dot (e.g. "example.com.")</span>
+	</div>
+	
+	<div class="actions">
+		<%= submit_tag(new_form ? "Create" : "Save") %>
+	</div>
+	
+<% end %>

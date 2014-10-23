@@ -1,0 +1,15 @@
+<%= render 'shared/project_info' %>
+
+<h1>Export Zones</h1>
+
+<p>Please copy the exported data from the text field below.</p>
+
+<p>To copy the text, press CTRL/CMD + C once the text is selected.</p>
+
+<div id="export-done">
+	<div class="form-group">
+		<%= text_area_tag :data, @export_data, class: "form-control", rows: 20 %>
+	</div>
+</div>
+
+<%= link_to "Done", project_zones_path(@project), class: "btn btn-lg btn-success"%>

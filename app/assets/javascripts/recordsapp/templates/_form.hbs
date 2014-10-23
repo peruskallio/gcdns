@@ -1,0 +1,72 @@
+{{#if isAdding}}
+<div class="type-selectors">
+	Choose record type:
+	<div class="btn-group">
+		<!--
+			Missing record types: NS, PTR, SOA
+			These CAN be also modified through the Google DNS API but
+			they require special care so not sure whether these should
+			be allowed to change through this UI...
+			
+			The NS and SOA record changes are needed if the Google
+			DNS is used as a backup DNS service.
+			
+			And the PTR records requires setting the authorative
+			name servers of the IP to be the Google DNS servers that
+			serve that domain.
+		-->
+		<a href="#" {{action "toggleRecordType" "A" on="click"}} {{bind-attr class=":btn recordTypeA:btn-primary:btn-default"}}>A</a>
+		<a href="#" {{action "toggleRecordType" "AAAA" on="click"}} {{bind-attr class=":btn recordTypeAAAA:btn-primary:btn-default"}}>AAAA</a>
+		<a href="#" {{action "toggleRecordType" "CNAME" on="click"}} {{bind-attr class=":btn recordTypeCNAME:btn-primary:btn-default"}}>CNAME</a>
+		<a href="#" {{action "toggleRecordType" "MX" on="click"}} {{bind-attr class=":btn recordTypeMX:btn-primary:btn-default"}}>MX</a>
+		<a href="#" {{action "toggleRecordType" "SPF" on="click"}} {{bind-attr class=":btn recordTypeSPF:btn-primary:btn-default"}}>SPF</a>
+		<a href="#" {{action "toggleRecordType" "SRV" on="click"}} {{bind-attr class=":btn recordTypeSRV:btn-primary:btn-default"}}>SRV</a>
+		<a href="#" {{action "toggleRecordType" "TXT" on="click"}} {{bind-attr class=":btn recordTypeTXT:btn-primary:btn-default"}}>TXT</a>
+	</div>
+</div>
+{{/if}}
+{{#if isEditing}}
+<div class="type-selectors">
+	Record type: {{recordType}}
+</div>
+{{/if}}
+
+{{#if recordErrors}}
+<div class="errors">
+	<div class="alert alert-danger">
+		<ul>
+		{{#each err in recordErrors}}
+			<li>{{err}}</li>
+		{{/each}}
+		</ul>
+	</div>
+</div>
+{{/if}}
+
+<div class="record-forms">
+	<div class="record">
+		<div {{bind-attr class=":form-group recordNameError:has-error"}}>
+			<label for="name">Name</label>
+			{{input id="name" class="form-control" placeholder="Name" value=recordName}}
+		</div>
+		<div {{bind-attr class=":form-group recordTTLError:has-error"}}>
+			<label for="ttl">TTL</label>
+			{{input id="ttl" class="form-control" placeholder="TTL" value=recordTTL}}
+		</div>
+		
+		<div class="data">
+			<label>Data</label>
+			<!-- Yo dawg! -->
+			<div class="well">
+				{{#each val in recordDataRows}}
+					<div class="data-row row-{{unbound _view.contentIndex}}">
+						<div>{{currentTime}}</div>
+						{{record-data index=_view.contentIndex errors=recordDataErrors record-type=recordType value=val update-action="updateDataRow" remove-action="removeDataRow"}}
+					</div>
+				{{/each}}
+				
+				<a href="#" class="btn btn-success" {{action "addDataRow" on="click"}}><span class="glyphicon glyphicon-plus-sign"></span></a>
+			</div>
+		</div>
+	</div>
+</div>

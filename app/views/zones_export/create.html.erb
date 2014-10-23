@@ -1,0 +1,111 @@
+<div id="error-section"></div>
+
+<%= render 'shared/project_info' %>
+
+<h1>Export Zones</h1>
+
+<div id="progress-section">
+	<div class="progress">
+		<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+			<span class="sr-only">0% Complete</span>
+		</div>
+	</div>
+	
+	<div class="general-info">
+		<p><%= @zones.length > 1 ? "Exporting %d zones." % @zones.length : "Exporting the selected zone." %></p>
+	</div>
+	<div class="progress-info">
+		<p>Starting exporting process...</p>
+	</div>
+</div>
+
+<div id="retry-container" style="display:none;">
+	<%= link_to "Retry", project_export_index_path(@project), class: 'btn btn-default btn-lg' %>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var processUrl = '<%= project_export_process_path(@project, @id) %>';
+	var completeUrl = '<%= project_export_process_done_path(@project, @id) %>';
+	var domains = <%= @zones.to_json.html_safe %>;
+	var domainsProcessed = 0;
+	var domainsTotal = domains.length;
+	var $progress = $('#progress-section');
+	
+	var updateProgress = function(percentage) {
+		var $bar = $('.progress .progress-bar', $progress);
+		$bar.attr('aria-valuenow', percentage).css('width', percentage + '%');
+		$('.sr-only', $bar).text(percentage + '%' + ' Complete');
+	};
+	var setProgressInfo = function(info) {
+		$('.progress-info', $progress).html('<p>' + info + '</p>');
+	};
+	var continueProcessing = function() {
+		if (domains.length > 0) {
+			var domain = domains.shift();
+			updateProgress(100*domainsProcessed/domainsTotal);
+			setProgressInfo("Processing zone " + domain);
+			processDomain(domain);
+		} else {
+			updateProgress(100);
+			setProgressInfo("Finished processing the export data. Redirecting...");
+			
+			window.location = completeUrl;
+		}
+	};
+	var processDomain = function(domain) {
+		$.ajax({
+			type: 'POST',
+			url: processUrl,
+			data: { zone: domain },
+			success: function(resp) {
+				if (resp.success) {
+					domainsProcessed++;
+					continueProcessing();
+				} else {
+					var errors = "";
+					if (resp.errors.length > 0) {
+						if (resp.errors.length > 1) {
+							errors = $('<ul></ul>');
+							$.each(resp.errors, function(item) {
+								errors.append('<li>' + item + '</li>')
+							});
+						} else {
+							errors = '<p>' + resp.errors.shift() + '</p>';
+						}
+					} else {
+						errors = "<p>Error during the export process.</p>";
+					}
+					
+					var $alert = $('<div class="alert alert-danger" role="alert"></div>');
+					$alert.append(errors);
+					$('.progress', $progress).hide();
+					setProgressInfo("Exporting failed.");
+					
+					$('#error-section').append($alert);
+					$('#retry-container').show();
+					
+					$('body').removeClass('wait');
+				}
+			},
+			error: function(resp) {
+				var errors = "<p>Error during the export process.</p>";
+				
+				var $alert = $('<div class="alert alert-danger" role="alert"></div>');
+				$alert.append(errors);
+				$('.progress', $progress).hide();
+				setProgressInfo("Exporting failed.");
+				
+				$('#error-section').append($alert);
+				$('#retry-container').show();
+				
+				$('body').removeClass('wait');
+			}
+		});
+	};
+	
+	// Start the process
+	$('body').addClass('wait');
+	continueProcessing();
+});
+</script>

@@ -1,0 +1,20 @@
+<%= render 'shared/project_info' %>
+
+<h1>Import Zones</h1>
+
+<p>Please paste the bind zone files to the field below. The pasted data may contain multiple consecutive zone files.</p>
+
+<p>Each individual zone file must start with the "$ORIGIN yourdomain.com" string. It is also suggested that the zone file defines a default ttl value with the "$TTL 21600" string right after the origin definition.</p>
+
+<%= form_tag do %>
+	
+	<div class="form-group">
+		<%= label_tag(:data, "Import data") %>
+		<%= text_area_tag :data, @data, class: "form-control", rows: 20 %>
+	</div>
+	
+	<div class="form-buttons">
+		<%= submit_tag "Import", class: 'btn btn-lg btn-primary' %>
+	</div>
+	
+<% end %>

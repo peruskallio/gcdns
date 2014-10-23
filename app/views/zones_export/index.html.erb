@@ -1,0 +1,37 @@
+<%= render 'shared/project_info' %>
+
+<h1>Export Zones</h1>
+
+<p>Select the zones you want to export into the BIND zone format.</p>
+
+<div id="export-container">
+	
+	<%= form_tag({action: :create}, {role: "form"}) do %>
+		
+		<div class="form-group">
+			<%= label_tag :ttl, "Default TTL" %>
+			<%= text_field_tag :ttl, 21600, class: "form-control", type: "number" %>
+		</div>
+		
+		<div class="form-group">
+			<div class="bulk-selectors">
+				<p>
+					<a href="#" class="select-all btn btn-default">Select All</a>
+					<a href="#" class="deselect-all btn btn-default">Deselect All</a>
+				</p>
+			</div>
+			
+			<ul class="list-group">
+			<% @zones.each do |zone| %>
+				<li class="zone-selector list-group-item">
+					<%= label_tag "zone-"+zone.id.to_s, check_box_tag("zone[]", zone.id, true) + " " + zone.name + " (" + zone.dns_name + ")" %>
+				</li>
+			<% end %>
+			</ul>
+		</div>
+		
+		
+		<%= submit_tag "Export", class: 'btn btn-primary btn-lg' %>
+		
+	<% end %>
+</div>

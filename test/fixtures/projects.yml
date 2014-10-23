@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  issuer: MyString
+  keydata: MyText
+  keypass: MyString
+
+two:
+  issuer: MyString
+  keydata: MyText
+  keypass: MyString

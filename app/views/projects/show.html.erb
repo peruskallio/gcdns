@@ -1,0 +1,22 @@
+<p>
+  <strong>Name:</strong>
+  <%= @project.name %>
+</p>
+
+<p>
+  <strong>Project ID:</strong>
+  <%= @project.project_key %>
+</p>
+
+<p>
+  <strong>Issuer:</strong>
+  <%= @project.issuer %>
+</p>
+
+<p>
+  <strong>Keypass:</strong>
+  <%= @project.keypass %>
+</p>
+
+<%= link_to 'Edit', edit_project_path(@project) %> |
+<%= link_to 'Back', root_url %>

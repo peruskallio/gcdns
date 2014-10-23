@@ -1,0 +1,31 @@
+#record-adder {
+  .type-selectors {
+    margin-bottom: 10px;
+  }
+}
+#records {
+  .record-forms {
+    .data-row {
+      border-top: 1px solid #cccccc;
+      padding: 10px 0;
+      
+      &.row-0 {
+        border-top: 0;
+        padding-top: 0;
+      }
+      h4 {
+        margin-top: 0;
+      }
+    }
+  }
+  table {
+    tr {
+      td.datas {
+        word-break: break-word;
+      }
+      td.buttons {
+        width: 110px;
+      }
+    }
+  }
+}
