@@ -43,7 +43,7 @@ class ZoneChangesController < RemoteController
         # If the SOA record was not updated during the request,
         # it needs to be updated manually in order to increment
         # the SOA serial value.
-        unless add.any? {|rec| rec.type == 'SOA'}
+        unless add && add.any? {|rec| rec.type == 'SOA'}
           zone.update_soa
         end
       else

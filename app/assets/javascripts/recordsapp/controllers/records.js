@@ -15,6 +15,7 @@ $(document).on('recordsapp:load', function() {
 	// http://www.mkyong.com/regular-expressions/domain-name-regular-expression-example/
 	var domainRegex = /^((?!-)[A-Za-z0-9-]{1,63}(?!-)\.)+[A-Za-z]{2,6}\.$/;
 	var numberRegex = /^[1-9][0-9]*$/;
+	var numberRegexLeadingZero = /^[0-9]*$/;
 	
 	RecordsApp.RecordsController = Ember.ArrayController.extend({
 		
@@ -25,6 +26,8 @@ $(document).on('recordsapp:load', function() {
 		recordDataRows: Ember.A([{}]),
 		recordDataErrors: Ember.A(),
 		isAdding: false,
+		
+		defaultTTL: 21600,
 		
 		fields: ["name", "TTL"],
 		deletedRecords: Ember.A(),
@@ -72,7 +75,7 @@ $(document).on('recordsapp:load', function() {
 						error: "Invalid hostname for %@."
 					},
 					priority: {
-						test: numberRegex,
+						test: numberRegexLeadingZero,
 						error: "Invalid priority for %@."
 					}
 				}
@@ -116,11 +119,11 @@ $(document).on('recordsapp:load', function() {
 						error: "Invalid port for %@."
 					},
 					priority: {
-						test: numberRegex,
+						test: numberRegexLeadingZero,
 						error: "Invalid priority for %@."
 					},
 					weight: {
-						test: numberRegex,
+						test: numberRegexLeadingZero,
 						error: "Invalid weight for %@."
 					}
 				}
@@ -150,13 +153,20 @@ $(document).on('recordsapp:load', function() {
 					this._resetErrors();
 					this._setRecordType('A');
 					this.set('isAdding', true);
+					this.set('recordTTL', this.get('defaultTTL'));
 				}
 			},
 			
 			toggleRecordType: function(type) {
+				var name = this.get('recordName');
+				var ttl = this.get('recordTTL');
+				
 				this._resetFields();
 				this._resetErrors();
 				this._setRecordType(type);
+				
+				this.set('recordName', name);
+				this.set('recordTTL', ttl);
 			},
 			
 			editAuthorativeEmail: function() {
