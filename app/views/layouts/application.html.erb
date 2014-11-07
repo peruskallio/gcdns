@@ -27,7 +27,7 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<% if @project %>
+				<% if @project && !@project.new_record? %>
 				<%= nav_link "Zones", project_zones_path(@project) %>
 				<%= nav_link "Import", project_import_index_path(@project) %>
 				<%= nav_link "Export", project_export_index_path(@project) %>

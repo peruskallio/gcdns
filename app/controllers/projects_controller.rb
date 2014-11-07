@@ -5,7 +5,7 @@
 
 class ProjectsController < ApplicationController
   
-  before_action :set_project, except: [:index]
+  before_action :set_project, except: [:index, :new, :create]
 
   # GET /projects
   # GET /projects.json
@@ -67,7 +67,7 @@ class ProjectsController < ApplicationController
   def destroy
     @project.destroy
     respond_to do |format|
-      format.html { redirect_to projects_url, notice: 'Project was successfully destroyed.' }
+      format.html { redirect_to root_url, notice: 'Project was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
