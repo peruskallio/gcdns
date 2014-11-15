@@ -7,6 +7,15 @@ Written in Ruby on Rails. Part of the UI is built with Ember.js.
 Provided by [Mainio Tech](http://www.mainiotech.fi/).
 
 
+## Update November 2014
+
+As of November 2014, the [Google Cloud Developer Console](https://developers.google.com/console/help/new/) now also provides a UI for managing the records.
+Therefore, it is unlikely that this project will see any progress in the future.
+
+This will still be available here as a reference implementation or a way to import or export the records into the Cloud DNS platform as those features are
+not provided by the current version of the Developer Console DNS management UI.
+
+
 ## Features
 
 * Attaching projects from the Google API console to be managed with this software
@@ -92,16 +101,10 @@ Please first create Git issues for any features you would like to work on so tha
 
 ## Future of This Project
 
-We started using Google Cloud DNS as our own primary DNS service, so we are somewhat committed keeping this up to date with the
-possible changes to the API. However, investing a lot of time into this project might not make sense since this might become
-useless at some point.
+Google Cloud Developer console now provides a UI for managing the Cloud DNS records so it is unlikely that this project will be maintained.
 
-This is because Google is planning to open up a new service called Google Domains. It is also currently provided as an invite-only
-beta. It is likely that once that tool becomes publicly available, it would make this software quite useless. However, there is no
-publically available information on when that service is scheduled to becomes public and what features it provides. Also, it 
-probably uses the Google Cloud DNS as a backend, so we would assume that migrating to that service would be quite easy.
-
-To learn more about Google Domains, the [service's home page](https://domains.google.com/about/).
+However, this project still acts as a good reference implementation on using the Cloud DNS API and also this provides some functionality that
+the current (November 2014) Cloud DNS UI does not. This functionality includes importing and exportign the DNS records in the BIND zone format.
 
 
 ## Copyrights and License
