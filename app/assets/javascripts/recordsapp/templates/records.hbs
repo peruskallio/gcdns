@@ -73,7 +73,9 @@
 						{{/each}}
 					</td>
 					<td class="buttons text-right">
-						{{record-buttons record=record edit-action="editRecord" remove-action="removeRecord"}}
+						{{#if canEdit }}
+							{{record-buttons record=record edit-action="editRecord" remove-action="removeRecord"}}
+						{{/if}}
 					</td>
 				</tr>
 			{{/each}}

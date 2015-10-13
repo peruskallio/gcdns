@@ -41,6 +41,7 @@ var methods = {
         $el.attr('id', 'zone-' + userID + '-' + id);
         $el.attr('class', 'permission');
         $el.append('<td>' + name + ' <input type="hidden" name="permissions[' + id + '][read]" value="on"></td>');
+        $el.append('<td class="text-center"><input type="checkbox" checked disabled="disabled"></td>');
         $.each(['edit', 'destroy'], function() {
             var $cell = $('<td class="text-center"></td>');
             $cell.append('<input type="checkbox" name="permissions[' + id + ']' + this + '" />');
