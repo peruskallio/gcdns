@@ -20,7 +20,7 @@ class ZonesImportController < RemoteController
       return redirect_to action: "index"
     end
 
-    data = params[:data] + "\n$ORIGIN empty.com"
+    data = params[:data] + "\n$ORIGIN empty.com."
 
     # Go through the data and store each zone into its own string
     zones = {}
@@ -65,7 +65,8 @@ class ZonesImportController < RemoteController
 
     if zones
       domain = params[:zone]
-      domain_dns = domain + '.'
+      domain_dns = domain
+      domain_dns += '.' unless /\.$/.match(domain)
 
       # Check that there is not an existing zone with this name already
       # in the API. Currently we do not allow importing existing records
@@ -155,7 +156,7 @@ class ZonesImportController < RemoteController
           zone = nil
           begin
             zone = GRemote::Zone.new
-            zone.name = domain.gsub(/[$!*()]/, '').gsub(/[._+]/, '-')
+            zone.name = domain.gsub(/[$!*()]/, '').gsub(/\.$/, '').gsub(/[._+]/, '-')
             zone.description = ""
             zone.dns_name = domain_dns
             zone.save
@@ -249,7 +250,8 @@ class ZonesImportController < RemoteController
         # Change short name into a full name. Google Clound DNS requires
         # the domain names to be in their full format. Please see:
         # https://cloud.google.com/dns/migrating-bind-differences
-        final += "." + zone_origin + "."
+        final += "." + zone_origin
+        final += "." unless /\.$/.match(zone_origin)
       end
 
       final
