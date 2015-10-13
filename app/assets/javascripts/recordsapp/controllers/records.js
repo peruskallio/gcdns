@@ -9,7 +9,7 @@
 
 $(document).on('recordsapp:load', function() {
 
-	var RECORD_TYPE_SORT_ORDER = Em.A(['SOA', 'NS', 'A', 'AAAA', 'CNAME', 'MX', 'PTR', 'SPF', 'SRV', 'TXT']);
+	var RECORD_TYPE_SORT_ORDER = Em.A(['SOA', 'NS', 'A', 'AAAA', 'CNAME', 'MX', 'PTR', 'SPF', 'SRV', 'TXT', 'PTR']);
 
 	// Domain regex from:
 	// http://www.mkyong.com/regular-expressions/domain-name-regular-expression-example/
@@ -138,7 +138,25 @@ $(document).on('recordsapp:load', function() {
 						error: "Invalid text for %@."
 					}
 				}
-			}
+			},
+
+            NS: {
+                validate: {
+                    value: {
+                        test: domainRegex,
+                        error: "Invalid mapping for %@."
+                    }
+                }
+            },
+
+            PTR: {
+                validate: {
+                    value: {
+                        test: domainRegex,
+                        error: "Invalid mapping for %@."
+                    }
+                }
+            },
 		},
 
 		actions: {

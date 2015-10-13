@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Mainio Tech Ltd.
- * 
+ *
  * @author Antti Hukkanen
  * @license See LICENSE (project root)
  */
@@ -9,15 +9,15 @@
 
 $(document).on('recordsapp:load', function() {
 	RecordsApp.RecordDataComponent = Ember.Component.extend({
-		
+
 		actions: {
-			
+
 			removeRow: function() {
 				this.sendAction('remove-action', this.get('index'));
 			}
-			
+
 		},
-		
+
 		rowChanged: function() {
 			var type = this.get('recordType');
 			var value = {};
@@ -34,26 +34,26 @@ $(document).on('recordsapp:load', function() {
 			}
 			this.sendAction('update-action', this.get('index'), value);
 		}.observes('recordValue', 'recordValueHostname', 'recordValuePriority', 'recordValueTarget', 'recordValuePort', 'recordValueWeight'),
-		
+
 		init: function() {
 			this._super();
-			
+
 			var type = this.get('record-type');
 			var index = this.get('index');
 			var value = this.get('value');
 			var errors = this.get('errors');
-			
+
 			this.set('recordType', type);
-			
+
 			this.set('dataIndex', index + 1);
 			this.set('canDelete', index > 0);
-			
+
 			var errorKeys = errors.filter(function(item) {
 				return item.index == index;
 			}).map(function(item) {
 				return item.key;
 			});
-			
+
 			errorKeys.forEach(function(key) {
 				var dataKey = 'recordValue';
 				if (key != 'value') {
@@ -62,7 +62,7 @@ $(document).on('recordsapp:load', function() {
 				}
 				this.set(dataKey + 'Error', true);
 			}, this);
-			
+
 			var defaultType = true;
 			if (type == 'A') {
 				this.set('dataName', 'IP Address (IPv4)');
@@ -72,10 +72,16 @@ $(document).on('recordsapp:load', function() {
 				this.set('dataName', 'Hostname');
 			} else if (type == 'SPF') {
 				this.set('dataName', 'SPF');
+			} else if (type == 'PTR') {
+                this.set('dataName', 'Mapping');
+            } else if (type == "SOA") {
+                this.set('dataName', 'Hostname');
+            } else if (type == "NS") {
+                this.set('dataName', 'Hostname');
 			} else {
 				defaultType = false;
 			}
-			
+
 			if (defaultType) {
 				this.set('recordTypeDefault', true);
 				this.set('valueIdAttribute', 'value' + index);
@@ -85,7 +91,7 @@ $(document).on('recordsapp:load', function() {
 				['MX', 'SRV', 'TXT'].forEach(function(testtype) {
 					this.set('recordType' + testtype, type == testtype);
 				}, this);
-				
+
 				if (type == 'MX') {
 					this.set('valueIdAttributeHostname', 'hostname' + index);
 					this.set('valueIdAttributePriority', 'priority' + index);
@@ -106,7 +112,7 @@ $(document).on('recordsapp:load', function() {
 				}
 			}
 		}
-		
+
 	});
 });
 

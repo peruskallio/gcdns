@@ -15,6 +15,7 @@
 			name servers of the IP to be the Google DNS servers that
 			serve that domain.
 		-->
+		<a href="#" {{action "toggleRecordType" "NS" on="click"}} {{bind-attr class=":btn recordTypeNS:btn-primary:btn-default"}}>NS</a>
 		<a href="#" {{action "toggleRecordType" "A" on="click"}} {{bind-attr class=":btn recordTypeA:btn-primary:btn-default"}}>A</a>
 		<a href="#" {{action "toggleRecordType" "AAAA" on="click"}} {{bind-attr class=":btn recordTypeAAAA:btn-primary:btn-default"}}>AAAA</a>
 		<a href="#" {{action "toggleRecordType" "CNAME" on="click"}} {{bind-attr class=":btn recordTypeCNAME:btn-primary:btn-default"}}>CNAME</a>
@@ -22,6 +23,7 @@
 		<a href="#" {{action "toggleRecordType" "SPF" on="click"}} {{bind-attr class=":btn recordTypeSPF:btn-primary:btn-default"}}>SPF</a>
 		<a href="#" {{action "toggleRecordType" "SRV" on="click"}} {{bind-attr class=":btn recordTypeSRV:btn-primary:btn-default"}}>SRV</a>
 		<a href="#" {{action "toggleRecordType" "TXT" on="click"}} {{bind-attr class=":btn recordTypeTXT:btn-primary:btn-default"}}>TXT</a>
+		<a href="#" {{action "toggleRecordType" "PTR" on="click"}} {{bind-attr class=":btn recordTypePTR:btn-primary:btn-default"}}>PTR</a>
 	</div>
 </div>
 {{/if}}
