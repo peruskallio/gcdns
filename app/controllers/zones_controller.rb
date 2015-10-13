@@ -5,7 +5,7 @@
 
 class ZonesController < RemoteController
 
-  before_action :set_project, only: [:index, :new, :create, :destroy]
+  before_action :set_project, only: [:show, :index, :new, :create, :destroy]
 
   def index
     @zones = current_user.allowed_zones(GRemote::Zone.list, @project, :read)
@@ -17,7 +17,6 @@ class ZonesController < RemoteController
     zone.id = params[:id]
     authorize zone unless current_user.has_role?(:admin, @project)
     @can_edit = current_user.has_role?(:admin, @project) || current_user.can_edit_zone?(zone)
-    @project = Project.find(params[:project_id])
   end
 
   def new
