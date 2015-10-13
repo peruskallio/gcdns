@@ -4,7 +4,7 @@
 # @license See LICENSE (project root)
 
 class ZoneRecordsController < RemoteController
-  
+
   # We want to return both the zone and the records for that zone
   # within the same request so that we can avoid calling the API
   # twice and thus, speeding up the whole fetching process.
@@ -12,16 +12,17 @@ class ZoneRecordsController < RemoteController
     error = nil
     begin
       @zone = GRemote::Zone.find(params[:zone_id])
+      authorize(@zone, :show?) unless current_user.has_role?(:admin, @project)
     rescue Exception => e
       error = e.message
     end
-    
+
     if error
       render json: {error: error}
     else
       # Which key names should be changed for records?
       record_keys = {"rrdatas" => "datas"}
-      
+
       idnum = 1
       record_ids = []
       records = @zone.recordsets.map {|item|
@@ -38,7 +39,7 @@ class ZoneRecordsController < RemoteController
         idnum += 1
         hash.except("kind")
       }
-      
+
       #.merge({"records" => record_ids})
       render json: {
         zones: [@zone.to_hash.select {|k,v| ["id", "name", "description", "dnsName"].include?(k) }],
@@ -46,6 +47,6 @@ class ZoneRecordsController < RemoteController
       }
     end
   end
-  
-  
+
+
 end

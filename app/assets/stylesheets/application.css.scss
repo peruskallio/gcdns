@@ -27,7 +27,7 @@ html,body {
 html.nprogress-busy #container {
   height: 100%;
   min-height: 100%;
-  
+
   cursor: wait;
   opacity: 0.5;
 }
@@ -42,4 +42,8 @@ body.wait, body.wait * {
 
 #container {
   padding-bottom: 20px;
+}
+
+.chosen-container {
+  width: 180px !important;
 }

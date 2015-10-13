@@ -4,7 +4,7 @@
 # @license See LICENSE (project root)
 
 class ProjectsController < ApplicationController
-  
+
   before_action :set_project, except: [:index, :new, :create]
 
   # GET /projects
@@ -26,6 +26,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
+    set_zones
   end
 
   # POST /projects
@@ -35,6 +36,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.save
+        current_user.add_role :admin, @project
         format.html { redirect_to @project, notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else
@@ -56,6 +58,7 @@ class ProjectsController < ApplicationController
         format.html { redirect_to @project, notice: 'Project was successfully updated.' }
         format.json { render :show, status: :ok, location: @project }
       else
+        set_zones
         format.html { render :edit }
         format.json { render json: @project.errors, status: :unprocessable_entity }
       end
@@ -71,9 +74,9 @@ class ProjectsController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
+
   private
-  
+
     # Use callbacks to share common setup or constraints between actions.
     def set_project
       if params[:project_id]
@@ -81,13 +84,26 @@ class ProjectsController < ApplicationController
       else
         @project = Project.find(params[:id])
       end
+      authorize @project
+    end
+
+    def set_zones
+      GRemote::DnsModel.initialize_api(@project)
+      @zones = GRemote::Zone.list
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def project_params
-      params.require(:project).permit(:name, :project_key, :issuer, :keydata, :keypass)
+      params.require(:project).permit(
+        :name,
+        :project_key,
+        :issuer,
+        :keydata,
+        :keypass,
+        roles_attributes: [:resource_id, :name]
+      )
     end
-    
+
     # Changes the uploaded file data into text data to be saved into the DB
     def save_params
       saveparams = project_params.clone
@@ -98,5 +114,5 @@ class ProjectsController < ApplicationController
       end
       saveparams
     end
-    
+
 end

@@ -46,7 +46,9 @@
 			<a href="#" class="btn btn-info" {{action "saveAuthorativeEmail" on="click"}}>Save</a>
 		</div>
 	{{else}}
-		<p><strong>Authorative Email:</strong> {{authorativeEmail}} <a href="#" {{action "editAuthorativeEmail"}} class="btn btn-default btn-xs">Edit</a></p>
+		{{#if canEdit}}
+			<p><strong>Authorative Email:</strong> {{authorativeEmail}} <a href="#" {{action "editAuthorativeEmail"}} class="btn btn-default btn-xs">Edit</a></p>
+		{{/if}}
 	{{/if}}
 	
 	<table class="table table-hover">
@@ -93,16 +95,18 @@
 			</div>
 		</div>
 	{{else}}
-		<button id="add-record" class="btn btn-success btn-lg" {{action "toggleRecordForm" on="click"}}>Add Record</button>
+		{{#if canEdit}}
+			<button id="add-record" class="btn btn-success btn-lg" {{action "toggleRecordForm" on="click"}}>Add Record</button>
+		{{/if}}
 	{{/if}}
 </div>
 
 
-
+{{#if canEdit}}
 <div>
 	<button class="btn btn-primary btn-lg pull-right" {{action "save"}} {{bind-attr disabled="isSaving"}}>Save</button>
 </div>
-
+{{/if}}
 <div>
 	<a href="#" {{action "exit"}}>Back</a>
 </div>

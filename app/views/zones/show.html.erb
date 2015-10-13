@@ -1,10 +1,11 @@
-<!-- 
+<!--
 	This view is handeled by the Ember.js app named "RecordsApp".
 -->
 <div id="records-app"></div>
 
 <script type="text/javascript">
 $(document).on('recordsapp:load', function() {
+	RecordsApp.set('canEdit', <%= @can_edit %>)
 	RecordsApp.set('backUrl', '<%= project_zones_path(@project) %>');
 });
 </script>

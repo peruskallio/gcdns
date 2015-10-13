@@ -4,36 +4,44 @@
 # @license See LICENSE (project root)
 
 class ZoneChangesController < RemoteController
-  
+
   def index
+    zone = GRemote::Zone.new
+    zone.id = params[:zone_id]
+    authorize(zone, :show?) unless current_user.has_role?(:admin, @project)
     changes = GRemote::Changes.list(params[:zone_id])
-    
+
     render json: {changes: changes}
   end
-  
+
   def show
+    zone = GRemote::Zone.new
+    zone.id = params[:zone_id]
+    authorize(zone, :show?) unless current_user.has_role?(:admin, @project)
     change = GRemote::Changes.find(params[:id], params[:zone_id])
-    
+
     render json: {change: change}
   end
-  
+
   def create
     error = nil
     begin
       zone = GRemote::Zone.new
       zone.id = params[:zone_id]
-      
+
+      authorize(zone, :edit?) unless current_user.has_role?(:admin, @project)
+
       changerec = params[:change]
-      
+
       changes = GRemote::Changes.new
       changes.zone = zone
-      
+
       add = recordset_list(changerec[:additions])
       del = recordset_list(changerec[:deletions])
-      
+
       changes.additions = add if add && add.length > 0
       changes.deletions = del if del && del.length > 0
-      
+
       if !changes.additions && !changes.deletions
         error = {
           type: 'no_changes',
@@ -49,7 +57,7 @@ class ZoneChangesController < RemoteController
       else
         error = {
           type: 'save_failed',
-          message: "Error during the API call." 
+          message: "Error during the API call."
         }
       end
     rescue Exception => e
@@ -59,7 +67,7 @@ class ZoneChangesController < RemoteController
       }
       raise e
     end
-    
+
     if error
       status = 500
       if error[:type] == 'no_changes'
@@ -72,9 +80,9 @@ class ZoneChangesController < RemoteController
       render json: {change: changes}
     end
   end
-  
+
   private
-    
+
     def recordset_list(data)
       if data
         list = []
@@ -84,11 +92,11 @@ class ZoneChangesController < RemoteController
           rset.type = record[:type]
           rset.ttl = record[:ttl]
           rset.rrdatas = record[:datas]
-          
+
           list.push rset
         end
         list
       end
     end
-  
+
 end

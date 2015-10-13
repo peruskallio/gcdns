@@ -24,6 +24,11 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1.10'
 
+# Use Rolify to define user roles
+gem "rolify", '~> 4.1.1'
+# Use pundit to do the authorization for roles
+gem "pundit", '~> 1.0.1'
+
 # Use unicorn as the app server
 # gem 'unicorn'
 

@@ -2,7 +2,7 @@
   <% if @project.errors.any? %>
 	<div id="error_explanation">
 		<h2><%= pluralize(@project.errors.count, "error") %> prohibited this project from being saved:</h2>
-		
+
 		<ul>
 			<% @project.errors.full_messages.each do |message| %>
 			<li><%= message %></li>
@@ -10,35 +10,156 @@
 		</ul>
 	</div>
 	<% end %>
-	
+
 	<p>Please use a <strong><a href="https://developers.google.com/accounts/docs/OAuth2ServiceAccount" target="_blank">Service Account</a></strong> for authentication.</p>
-	
+
 	<div class="form-group">
 		<%= f.label :name %>
 		<%= f.text_field :name, class: "form-control" %>
 	</div>
-	
+
 	<div class="form-group">
 		<%= f.label :project_key %><br>
 		<%= f.text_field :project_key, class: "form-control" %>
 	</div>
-	
+
 	<div class="form-group">
 		<%= f.label :issuer, 'Issuer (Email)' %>
 		<%= f.text_field :issuer, class: "form-control" %>
 	</div>
-	
+
 	<div class="form-group">
 		<%= f.label :keydata %>
 		<%= f.file_field :keydata, class: "form-control" %>
 	</div>
-	
+
 	<div class="form-group">
 		<%= f.label :keypass %>
 		<%= f.text_field :keypass, class: "form-control" %>
 	</div>
-	
+
 	<div class="actions">
 		<%= f.submit class: "btn btn-primary" %>
 	</div>
+<% end %>
+
+<% unless @project.new_record? %>
+
+	<h2>Add user</h2>
+	<% if @project.addable_users.count > 0 %>
+		<%= form_tag project_permissions_path(@project), class: 'form form-inline' do %>
+			<%= select_tag :id, options_for_select(@project.addable_users.collect { |u| [u.email, u.id] } ), include_blank: true, class: 'chosen', data: { placeholder: 'Select user'} %>
+			<%= select_tag :name, options_for_select([['Zone manager', 'zone_manager'], ['Admin', 'admin']]), class: 'form-control' %>
+			<%= submit_tag "Add user", class: 'btn btn-primary' %>
+		<% end %>
+	<% else %>
+		<p>No additional users found.</p>
+	<% end %>
+
+
+<h2>Users</h2>
+
+<table style="max-width: 900px;" class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Email</th>
+			<th>Role</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<% admin_role = @project.roles.find_by(name: 'admin') %>
+		<% unless admin_role.nil? %>
+			<% admin_role.users.each do |user| %>
+				<tr>
+					<td><%= user.email %></td>
+					<td>Admin</td>
+					<td>
+						<% if current_user != user %>
+							<div class="pull-right">
+								<%= link_to "Demote to zone manager", project_permission_path(project_id: @project.id, id: user.id, name: :zone_manager), method: :put, class: "btn btn-xs btn-warning" %>
+							</div>
+						<% end %>
+					</td>
+				</tr>
+			<% end %>
+		<% end %>
+		<% zone_manager_role = @project.roles.find_by(name: 'zone_manager') %>
+		<% unless zone_manager_role.nil? %>
+			<% zone_manager_role.users.each_with_index do |user, n| %>
+				<tr>
+					<td><%= user.email %></td>
+					<td>Zone manager</td>
+					<td>
+						<% if current_user != user %>
+							<div class="pull-right">
+								<a data-toggle="collapse" href="#zones-<%= n+1 %>" class="btn btn-xs btn-default">Edit</a>
+								&nbsp;
+								<%= link_to "Remove user", project_permission_path(project_id: @project.id, id: user.id), method: :delete, class: "btn btn-xs btn-danger", data: { confirm: 'Remove user?' } %>
+							</div>
+						<% end %>
+					</td>
+				</tr>
+				<tr id="zones-<%= n+1 %>" class="collapse">
+					<td colspan="3">
+						<%= form_tag project_permission_path(@project, user.id), method: :put do %>
+							<label class="pull-left">
+								<div class="checkbox">
+									<input type="hidden" name="name[]" value="zone_manager">
+									<label>
+										<input type="checkbox" name="name[]" value="zone_creator" <%= user.has_role?(:zone_creator, @project) ? 'checked' : '' %>> <strong>Can create zones</strong>
+									</label>
+								</div>
+							</label>
+
+							<%= link_to "Promote to admin", project_permission_path(project_id: @project.id, id: user.id, name: :admin), method: :put, class: "pull-right btn btn-xs btn-default" %>
+							<table style="margin-top: 50px;" data-user-id="<%= user.id %>" class="table table-condensed permission-edit">
+								<tr>
+									<th>Zone</th>
+									<th class="text-center">Can edit</th>
+									<th class="text-center">Can destroy</th>
+									<th></th>
+								</tr>
+								<tr class="no-zones" <%= user.allowed_zones(@zones, @project, :read).length > 0 ? 'style="display: none;"'.html_safe : '' %>>
+									<td colspan="4">
+										<p class="small italic text-center"><%= user.email %> has no zones yet.</p>
+									</td>
+								</tr>
+								<% user.allowed_zones(@zones, @project, :read).each do |zone| %>
+									<%
+										# Please note that if you edit this table row, you should also make the same
+										# changes to assets/javascripts/permissions.js:[methods.permissionElement]
+									%>
+									<tr class="permission" id="zone-<%= user.id %>-<%= zone.id %>">
+										<td>
+											<%= zone.name %>
+											<input type="hidden" name="permissions[<%= zone.id %>][read]" value="on">
+										</td>
+										<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][edit]" <%= user.can_edit_zone?(zone) ? 'checked' : '' %>/></td>
+										<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][destroy]" <%= user.can_destroy_zone?(zone) ? 'checked' : '' %>/></td>
+										<td><a class="remove-permission btn btn-xs btn-danger pull-right">&times;</a></td>
+									</tr>
+								<% end %>
+								<tr>
+									<td colspan="4">
+										<form class="form form-inline">
+											<select style="width: 180px;" class="chosen permission-select" data-placeholder="Add zone">
+												<option></option>
+												<% @zones.each do |zone| %>
+													<option value="<%= zone.id %>"><%= zone.name %></option>
+												<% end %>
+											</select>
+											<a href="#" class="btn btn-primary add-permission">Add</a>
+										</form>
+									</td>
+								</tr>
+							</table>
+							<%= submit_tag "Update permissions", class: "btn pull-right btn-primary" %>
+						<% end %>
+					</td>
+				</tr>
+			<% end %>
+		<% end %>
+	</tbody>
+</table>
 <% end %>

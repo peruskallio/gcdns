@@ -4,13 +4,14 @@
 # @license See LICENSE (project root)
 
 class ZonesImportController < RemoteController
-  
+
   skip_before_action :verify_authenticity_token, only: [:process_zone, :process_done]
-  
+  before_action :authorize_project
+
   def index
-    
+
   end
-  
+
   def create
     # Add an empty zone to the end of the data string so that the
     # last actual zone is also added to the zones array.
@@ -18,9 +19,9 @@ class ZonesImportController < RemoteController
       flash[:alert] = "Zone file data not defined."
       return redirect_to action: "index"
     end
-    
+
     data = params[:data] + "\n$ORIGIN empty.com"
-    
+
     # Go through the data and store each zone into its own string
     zones = {}
     @domains = []
@@ -48,7 +49,7 @@ class ZonesImportController < RemoteController
       end
       current += line
     end
-    
+
     if @domains.length > 0
       @id = save_zones(zones)
       @project = Project.find(params[:project_id])
@@ -57,20 +58,20 @@ class ZonesImportController < RemoteController
       render action: "index"
     end
   end
-  
+
   def process_zone
     errors = []
     zones = fetch_zones(params[:import_id])
-    
+
     if zones
       domain = params[:zone]
       domain_dns = domain + '.'
-      
-      # Check that there is not an existing zone with this name already 
+
+      # Check that there is not an existing zone with this name already
       # in the API. Currently we do not allow importing existing records
       # due to the load it might cause for a single request. If the user
       # wants to improt existing zone, the zone needs to be removed first.
-      
+
       # TODO: This does not currently handle paging of the zone listing...
       # There is also currently no way to do search calls to the API.
       project = Project.find(params[:project_id])
@@ -80,17 +81,17 @@ class ZonesImportController < RemoteController
           errors.push("A zone already exists with the DNS name '%s'." % domain_dns)
         end
       end
-      
+
       zone_string = zones[domain] if errors.length < 1
-      
+
       if zone_string
         # Load zone and read its data
-        
+
         zone_records = {}
         num_records = 0
-        
+
         zone = DNS::Zone.load(zone_string)
-        
+
         zone.records.each do |rec|
           # We do not handle SOA or NS records for the import.
           data = nil
@@ -115,23 +116,23 @@ class ZonesImportController < RemoteController
               data = '"' + data + '"'
             end
           end
-          
+
           # We don't want to import empty data records because
           # the Google DNS API does not like them (as it shouldn't).
           if !data.nil? && data.strip.length > 0
             # Default TTL is 24h (86400s) if it has not been set for the zone.
             ttl = rec.ttl.nil? ? (zone.ttl.nil? ? 21600 : zone.ttl) : rec.ttl
             ttl = ttl.to_s
-            
+
             name = rec.label
             if name == '@'
               name = zone.origin + "."
             else
               name = hostname(name, zone.origin)
             end
-            
+
             zone_records[name] = {} unless zone_records[name]
-            
+
             datas = []
             if zone_records[name][rec.type]
               # The Google DNS API does not allow multiple records of the
@@ -140,7 +141,7 @@ class ZonesImportController < RemoteController
               datas = zone_records[name][rec.type][:datas]
             end
             datas.push(data)
-            
+
             zone_records[name][rec.type] = {
               :ttl => ttl,
               :datas => datas
@@ -148,7 +149,7 @@ class ZonesImportController < RemoteController
             num_records += 1
           end
         end
-        
+
         if num_records > 0
           # Create the remote zone
           zone = nil
@@ -158,16 +159,17 @@ class ZonesImportController < RemoteController
             zone.description = ""
             zone.dns_name = domain_dns
             zone.save
+            current_user.create_permissions_for_new_zone(zone, @project)
           rescue Exception => e
             errors.push(e.message)
           end
-          
+
           if errors.length < 1
             # Add the records to a changes request and send it to the API.
             additions = []
             zone_records.each do |name, typedatas|
               typedatas.each do |type, details|
-                
+
                 # Sort the datas before adding them to the RecordSet object.
                 # We want the MX and SRV records to be sorted by their priority
                 # as the first criteria.
@@ -175,7 +177,7 @@ class ZonesImportController < RemoteController
                   if type == 'MX' || type == 'SRV'
                     aparts = a.split(" ")
                     bparts = b.split(" ")
-                    
+
                     if aparts[0].to_i == bparts[0].to_i
                       # Compare the MX/SRV record strings without the priority part
                       aparts[1..-1].join(" ") <=> bparts[1..-1].join(" ")
@@ -187,7 +189,7 @@ class ZonesImportController < RemoteController
                     a <=> b
                   end
                 end
-                
+
                 rset = GRemote::RecordSet.new
                 rset.name = name
                 rset.type = type
@@ -196,13 +198,13 @@ class ZonesImportController < RemoteController
                 additions.push(rset)
               end
             end
-            
+
             begin
               changes = GRemote::Changes.new
               changes.zone = zone
               changes.additions = additions
               changes.save
-              
+
               zone.update_soa
             rescue Exception => e
               errors.push(e.message)
@@ -215,14 +217,14 @@ class ZonesImportController < RemoteController
     else
       errors.push("Cannot find the import data.")
     end
-    
+
     if errors.length > 0
       render json: {success: 0, errors: errors}
     else
       render json: {success: 1}
     end
   end
-  
+
   def process_done
     error = nil
     begin
@@ -230,50 +232,50 @@ class ZonesImportController < RemoteController
     rescue Exception => e
       error = e.message
     end
-    
+
     if error
       render json: {success: 0, error: error}
     else
       render json: {success: 1}
     end
   end
-  
+
   private
-    
+
     def hostname(localname, zone_origin)
       final = localname.strip
-      
+
       if final[-1, 1] != '.'
         # Change short name into a full name. Google Clound DNS requires
         # the domain names to be in their full format. Please see:
         # https://cloud.google.com/dns/migrating-bind-differences
         final += "." + zone_origin + "."
       end
-      
+
       final
     end
-    
+
     def fetch_zones(id)
       JSON.load(File.open(tmp_file(id), 'r') { |f| f.read })
     end
-    
+
     def clear_zones(id)
       file = tmp_file(id)
       File.delete(file) if File.exist?(file)
     end
-    
+
     def save_zones(zones)
       # Create random ID for the saved data.
       id = SecureRandom.hex(16)
-      
+
       # And save it
       File.open(tmp_file(id), 'w', 0600) do |file|
         file.write(zones.to_json)
       end
-      
+
       id
     end
-    
+
     def tmp_file(id)
       dir = Rails.root.join("tmp", "zones")
       unless File.directory?(dir)
@@ -281,5 +283,9 @@ class ZonesImportController < RemoteController
       end
       dir.join("import_" + id + ".json")
     end
-    
+
+    def authorize_project
+      authorize @project, :create_zone?
+    end
+
 end

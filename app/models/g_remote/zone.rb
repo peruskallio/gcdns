@@ -5,49 +5,53 @@
 
 module GRemote
   class Zone < DnsModel
-    
+
     attr_accessor :id, :name, :description, :dns_name
-    
+
+    def self.policy_class
+      ZonePolicy
+    end
+
     def recordsets
       # Fetch the records list
       GRemote::RecordSet.list_for(self.id ? self.id : self.name)
     end
-    
+
     # Find recordsets by params (e.g. recordsets_by(name: 'domain.com', type: 'SOA'))
     def recordsets_by(params)
       GRemote::RecordSet.list_for(self.id ? self.id : self.name, params)
     end
-    
+
     def soa_record
       self.recordsets_by(name: self.dns_name, type: 'SOA').detect do |rset|
         rset.name == self.dns_name && rset.type == 'SOA'
       end
     end
-    
+
     def update_soa(params={})
       soa = self.soa_record
       current = soa.rrdatas.first.split(/\s+/)
-      
+
       # NOTE:
       # The serial needs to be incremented every time updates are made
       # so we do not allow passing any parameters that define this.
       # The serial is an unsigned 32 bit integer between 0 and 4294967295.
-      
+
       # We allow updating the domain authority email (1)
       # The serial (2) is incremented automatically by 1.
       # 0: Primary name server
-      updated = current[0] 
-      
+      updated = current[0]
+
       # 1: Email for the responsible party of the domain
       if params[:email]
         updated += " " + params[:email]
       else
         updated += " " + current[1]
       end
-      
+
       # 2: Serial
       serial = current[2]
-      
+
       # TODO: The serial format could be configurable option (application config).
       # TODO: The same configuration should apply here and in the frontend (Records controller).
       if true
@@ -73,22 +77,22 @@ module GRemote
         end
         serial = date + ("%.2d" % (increment + 1))
       end
-      
+
       updated += " " + serial
-      
+
       # 3: Refresh interval
       # 4: Retry time
       # 5: Expiry time
       # 6: Minimum TTL
       updated += " " + current[3..6].join(" ")
-      
+
       # Create an updated RecordSet
       upd_soa = GRemote::RecordSet.new
       upd_soa.name = soa.name
       upd_soa.type = soa.type
       upd_soa.ttl = soa.ttl
       upd_soa.rrdatas = [updated]
-      
+
       # Send the changes request
       changes = GRemote::Changes.new
       changes.zone = self
@@ -96,7 +100,7 @@ module GRemote
       changes.deletions = [soa]
       changes.save
     end
-    
+
     def save
       result = @@helper.api_call do |service|
         @@helper.api_request service.managed_zones.create, {
@@ -107,15 +111,15 @@ module GRemote
           dnsName: self.dns_name
         }
       end
-      
+
       self.id = result.data.id
-      
+
       # If the API call does not return an error, it is successful.
       # And if that happens, the parent class should already raise
       # an exception in that case.
       true
     end
-    
+
     def delete
       # The zone needs to be empty in order for it to allow its deletion.
       # However, we do not need to delete the original records, i.e. the
@@ -137,7 +141,7 @@ module GRemote
           raise "Error deleting the zone records."
         end
       end
-      
+
       begin
         result = @@helper.api_call do |service|
           @@helper.api_request service.managed_zones.delete, {
@@ -150,13 +154,13 @@ module GRemote
         # does not return a record and this error
         # should be disregarded.
       end
-      
+
       # If the API call does not return an error, it is successful.
       # And if that happens, the parent class should already raise
       # an exception in that case.
       true
     end
-    
+
     def self.find(id_or_name)
       result = @@helper.api_call do |service|
         @@helper.api_request service.managed_zones.get, {
@@ -166,14 +170,14 @@ module GRemote
       end
       self.initialize_from(result.data)
     end
-    
+
     def self.list
       result = @@helper.api_call do |service|
         @@helper.api_request service.managed_zones.list, {
           project: @@project.project_key
         }
       end
-      
+
       zones = []
       if result.data["managedZones"]
         result.data["managedZones"].each do |record|
@@ -182,6 +186,6 @@ module GRemote
       end
       zones
     end
-    
+
   end
 end

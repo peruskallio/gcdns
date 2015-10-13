@@ -6,22 +6,26 @@
 		<tr>
 			<th>Name</th>
 			<th>Project ID</th>
-			<th>Issuer</th>
-			<th>Keypass</th>
 			<th colspan="3"></th>
 		</tr>
 	</thead>
-	
+
 	<tbody>
 	<% @projects.each do |project| %>
 		<tr>
 			<td><%= link_to project.name, project_zones_path(project) %></td>
 			<td><%= project.project_key %></td>
-			<td><%= project.issuer %></td>
-			<td><%= project.keypass %></td>
 			<td><%= link_to 'Show', project %></td>
-			<td><%= link_to 'Edit', edit_project_path(project) %></td>
-			<td><%= link_to 'Destroy', project, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+			<td>
+				<% if policy(project).edit? %>
+				<%= link_to 'Edit', edit_project_path(project) %>
+				<% end %>
+			</td>
+			<td>
+				<% if policy(project).destroy? %>
+				<%= link_to 'Destroy', project, method: :delete, data: { confirm: 'Are you sure?' } %>
+				<% end %>
+			</td>
 		</tr>
 	<% end %>
 	</tbody>

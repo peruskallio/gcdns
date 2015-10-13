@@ -21,7 +21,9 @@
 				<td><%= zone.dns_name %></td>
 				<td><%= zone.description %></td>
 				<td class="text-right">
-					<%= link_to 'Destroy', project_zone_path(@project, zone.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+					<% if current_user.has_role?(:admin, @project) || current_user.can_destroy_zone?(zone)  %>
+						<%= link_to 'Destroy', project_zone_path(@project, zone.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+					<% end %>
 				</td>
 			</tr>
 		<% end %>
@@ -31,5 +33,6 @@
 	<p><%= t '.no_zones' %></p>
 <% end %>
 
-
-<%= link_to 'New Zone', new_project_zone_path(@project), class: "btn btn-lg btn-success" %>
+<% if current_user.has_role?(:admin, @project) || current_user.has_role?(:zone_creator, @project)  %>
+	<%= link_to 'New Zone', new_project_zone_path(@project), class: "btn btn-lg btn-success" %>
+<% end %>

@@ -8,6 +8,8 @@
 //= require turbolinks
 //= require jquery
 //= require bootstrap/dropdown
+//= require bootstrap/collapse
+//= require bootstrap/transition
 //= require nprogress
 //= require nprogress-turbolinks
 //= require jquery
@@ -15,7 +17,9 @@
 //= require ember
 //= require ember-data
 //= require lib/path_initializer
+//= require lib/chosen.jquery.min
 //= require_tree ./views
+//= require permissions
 //= require_self
 
 // Bind all the starting actions of a page to the "pageready"
@@ -25,6 +29,8 @@ $(document).on('ready page:load', function(ev) {
 	ev.originalType = ev.type;
 	ev.type = "pageready";
 	$(this).trigger(ev, args);
-	
+
 	PathInitializer.load();
+	$('.permission-edit').permissionUI();
+	$('select.chosen').chosen();
 });
