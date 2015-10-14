@@ -36,21 +36,21 @@
 	<h2>Zone Records</h2>
 	
 	<p>Note: The lower you set the TTL values, the more queries your records produce to the Google DNS servers. Therefore, setting a low TTL will result in a bigger bill from Google.</p>
-	
-	{{#if editingAuthorativeEmail}}
-		<div class="form-inline" role="form">
-			<div class="form-group" {{bind-attr class=":form-group authorativeEmailError:has-error"}}>
-				<label for="authorativeEmail">Authorative Email</label>
-				{{input id="authorativeEmail" class="form-control" type="email" placeholder="Enter Authorative Email" value=authorativeEmail}}
+	{{#if editAuthorativeEmailEnabled}}
+		{{#if editingAuthorativeEmail}}
+			<div class="form-inline" role="form">
+				<div class="form-group" {{bind-attr class=":form-group authorativeEmailError:has-error"}}>
+					<label for="authorativeEmail">Authorative Email</label>
+					{{input id="authorativeEmail" class="form-control" type="email" placeholder="Enter Authorative Email" value=authorativeEmail}}
+				</div>
+				<a href="#" class="btn btn-info" {{action "saveAuthorativeEmail" on="click"}}>Save</a>
 			</div>
-			<a href="#" class="btn btn-info" {{action "saveAuthorativeEmail" on="click"}}>Save</a>
-		</div>
-	{{else}}
-		{{#if canEdit}}
-			<p><strong>Authorative Email:</strong> {{authorativeEmail}} <a href="#" {{action "editAuthorativeEmail"}} class="btn btn-default btn-xs">Edit</a></p>
+		{{else}}
+			{{#if canEdit}}
+				<p><strong>Authorative Email:</strong> {{authorativeEmail}} <a href="#" {{action "editAuthorativeEmail"}} class="btn btn-default btn-xs">Edit</a></p>
+			{{/if}}
 		{{/if}}
 	{{/if}}
-	
 	<table class="table table-hover">
 		<thead>
 			<tr>

@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Mainio Tech Ltd.
- * 
+ *
  * @author Antti Hukkanen
  * @license See LICENSE (project root)
  */
@@ -12,6 +12,7 @@ $(document).on('recordsapp:load', function() {
 		name: DS.attr('string'),
 		type: DS.attr('string'),
 		ttl: DS.attr('number'),
+		permanent: DS.attr('boolean'),
 		datas: DS.attr('array')
 	});
 });

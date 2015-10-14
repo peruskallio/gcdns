@@ -34,6 +34,8 @@ class ZoneRecordsController < RemoteController
           end
         }
         hash["id"] = idnum
+
+        hash["permanent"] = hash["type"] == "SOA" || (hash["type"] == "NS" && hash["name"] == @zone.dns_name)
         #hash["zone"] = @zone.id
         record_ids.push(idnum)
         idnum += 1

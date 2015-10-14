@@ -157,6 +157,41 @@ $(document).on('recordsapp:load', function() {
                     }
                 }
             },
+
+            SOA: {
+                value: ["primary", "responsible", "version", "refresh", "retry", "timeout", "negative"],
+                setErrorsOnMain: true,
+                validate: {
+                    primary: {
+                        test: domainRegex,
+                        error: "Invalid primary name server."
+                    },
+                    responsible: {
+                        test: domainRegex,
+                        error: "Invalid responsible party for the domain."
+                    },
+                    version: {
+                        test: numberRegex,
+                        error: "Invalid version."
+                    },
+                    refresh: {
+                        test: numberRegex,
+                        error: "Invalid refresh."
+                    },
+                    retry: {
+                        test: numberRegex,
+                        error: "Invalid retry."
+                    },
+                    timeout: {
+                        test: numberRegex,
+                        error: "Invalid timeout."
+                    },
+                    negative: {
+                        test: numberRegex,
+                        error: "Invalid negative."
+                    },
+                }
+            }
 		},
 
 		actions: {
@@ -299,6 +334,7 @@ $(document).on('recordsapp:load', function() {
 				this._setRecordType(type);
 				this.set('recordForEdit', record);
 				this.set('recordName', editName);
+				this.set('recordPermanent', record.get('permanent'));
 				this.set('recordTTL', record.get('ttl'));
 
 				record.get('datas').forEach(function(item) {
@@ -315,6 +351,16 @@ $(document).on('recordsapp:load', function() {
 							port: parts[2],
 							target: parts[3]
 						});
+					} else if (type == 'SOA') {
+					    /* There should be only one SOA record! */
+					    this.set('recordPrimary', parts[0]);
+					    this.set('recordResponsible', parts[1]);
+					    this.set('recordVersion', parts[2]);
+					    this.set('recordRefresh', parts[3]);
+					    this.set('recordRetry', parts[4]);
+					    this.set('recordTimeout', parts[5]);
+					    this.set('recordNegative', parts[6]);
+
 					} else {
 						recordDataRows.pushObject({value: item});
 					}
@@ -596,11 +642,23 @@ $(document).on('recordsapp:load', function() {
 				errors.push("Invalid record TTL.");
 			}
 
-			var typeObject = this.recordTypes[recordType];
+            var typeObject = this.recordTypes[recordType];
+
+            /* Combine SOA record variables to recordData */
+            if (recordType == "SOA") {
+                var recordDataRow = [];
+                Ember.A(typeObject.value).forEach(function(val) {
+                    var valUpcase = val.charAt(0).toUpperCase() + val.slice(1);
+                    recordDataRow[val] = this.get('record' + valUpcase);
+                }, this);
+                this.get('recordDataRows')[0] = recordDataRow;
+            }
+
 			if (typeObject) {
 				var validations = typeObject.validate;
 				var validRecord = true;
 				if (validations) {
+				    var model = this;
 					// Go through all the validations for this record
 					this.get('recordDataRows').forEach(function(data, index) {
 						for (var key in validations) {
@@ -623,7 +681,12 @@ $(document).on('recordsapp:load', function() {
 							if (!success) {
 								validRecord = false;
 								//this.set(dataKey + "Error", true);
-								dataErrors.pushObject({index: index, key: key});
+								if (typeObject.setErrorsOnMain) {
+								    var keyUpcase = key.charAt(0).toUpperCase() + key.slice(1);
+								    model.set('record' + keyUpcase + 'Error', true);
+								} else {
+								    dataErrors.pushObject({index: index, key: key});
+								}
 
 								var message = Ember.String.fmt(validations[key].error, ["Record " + (index + 1)]);
 								if (message) {
@@ -635,12 +698,15 @@ $(document).on('recordsapp:load', function() {
 						}
 					});
 				}
+
 				if (validRecord) {
 					this.get('recordDataRows').forEach(function(rdata, index) {
+
 						var value = "";
 						if (typeObject.value) {
 							for (var i=0; i < typeObject.value.length; i++) {
 								var key = typeObject.value[i];
+								console.log(key);
 								if (i > 0) {
 									value += " ";
 								}

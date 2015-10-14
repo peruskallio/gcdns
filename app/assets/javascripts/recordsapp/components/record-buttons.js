@@ -26,10 +26,12 @@ $(document).on('recordsapp:load', function() {
 			this._super();
 
 			var record = this.get('record');
-			var specialRecord = Ember.A([]).any(function(item) {
+			var unEditable = Ember.A([]).any(function(item) {
 				return record.get('type') == item;
 			});
-			this.set('canManageRecord', !specialRecord);
+
+			this.set('canManageRecord', !unEditable);
+			this.set('canRemoveRecord', !record.get('permanent'));
 		}
 
 	});

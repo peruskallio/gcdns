@@ -63,6 +63,7 @@ class ZonesController < RemoteController
       @zone.id = params[:id]
       authorize @zone unless current_user.has_role? :admin, @project
       @zone.delete
+      ZonePermission.where(zone_id: params[:id]).destroy_all
     rescue Exception => e
       error = e.message
       raise e

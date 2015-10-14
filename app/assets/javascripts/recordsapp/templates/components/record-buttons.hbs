@@ -1,4 +1,6 @@
 {{#if canManageRecord}}
 <a href="#" class="btn btn-default" {{action "editRecord"}}>Edit</a>
+{{/if}}
+{{#if canRemoveRecord}}
 <a href="#" class="btn btn-danger" {{action "removeRecord"}}>-</a>
 {{/if}}

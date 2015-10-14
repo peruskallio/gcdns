@@ -64,6 +64,7 @@ $(document).on('recordsapp:load', function() {
 			}, this);
 
 			var defaultType = true;
+
 			if (type == 'A') {
 				this.set('dataName', 'IP Address (IPv4)');
 			} else if (type == 'AAAA') {
@@ -74,8 +75,6 @@ $(document).on('recordsapp:load', function() {
 				this.set('dataName', 'SPF');
 			} else if (type == 'PTR') {
                 this.set('dataName', 'Mapping');
-            } else if (type == "SOA") {
-                this.set('dataName', 'Hostname');
             } else if (type == "NS") {
                 this.set('dataName', 'Hostname');
 			} else {
@@ -88,7 +87,7 @@ $(document).on('recordsapp:load', function() {
 				this.set('recordValue', value.value);
 			} else {
 				// Record types that need special form elements.
-				['MX', 'SRV', 'TXT'].forEach(function(testtype) {
+				['MX', 'SRV', 'TXT', 'SOA'].forEach(function(testtype) {
 					this.set('recordType' + testtype, type == testtype);
 				}, this);
 
