@@ -4,14 +4,17 @@ class PermissionsController < ApplicationController
   before_action :set_user
 
   def create
-    @user.remove_role(:admin, @project)
-    @user.remove_role(:zone_manager, @project)
-    @user.add_role(params[:name], @project)
-
-    respond_to do |format|
-      format.html { redirect_to edit_project_path(@project), notice: "User was added successfully." }
-      format.json { render :show, status: :ok, location: @project }
+    if @user.nil?
+      msg = { alert: "User was not found." }
+    elsif @project.roles.any? { |r| @user.has_role?(r.name, @project) }
+      msg = { alert: "User is already added to the project." }
+    else
+      @user.remove_role(:admin, @project)
+      @user.remove_role(:zone_manager, @project)
+      @user.add_role(params[:name], @project)
+      msg = { notice: "User was added successfully." }
     end
+    redirect_to edit_project_path(@project), msg
   end
 
   def update
@@ -37,19 +40,13 @@ class PermissionsController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      format.html { redirect_to edit_project_path(@project), notice: "User was updated successfully." }
-      format.json { render :show, status: :ok, location: @project }
-    end
+    redirect_to edit_project_path(@project), notice: "User was updated successfully."
   end
 
   def destroy
     @user.zone_permissions.where(project: @project).destroy_all
     @user.roles(@project).destroy_all
-    respond_to do |format|
-      format.html { redirect_to edit_project_path(@project), notice: "User was removed successfully." }
-      format.json { render :show, status: :ok, location: @project }
-    end
+    redirect_to edit_project_path(@project), notice: "User was removed successfully."
   end
 
   private
@@ -59,8 +56,12 @@ class PermissionsController < ApplicationController
     end
 
     def set_user
-      @user = User.find(params[:id])
-      raise "Unauthorized" if @user == current_user
+      if params.has_key?(:email)
+        @user = User.find_by(email: params[:email])
+      else
+        @user = User.find(params[:id])
+      end
+      redirect_to edit_project_path(@project), alert: "You can not edit your own credentials!" if @user == current_user
     end
 
 end

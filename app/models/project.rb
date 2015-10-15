@@ -14,8 +14,16 @@ class Project < ActiveRecord::Base
 
   validates :name, presence: true
   validates :project_key, presence: true
-  validates :issuer, presence: true
+  validates :issuer, presence: true, unless: :json_credentials?
+  validate :mandatory_json_values, if: :json_credentials?
   validates :keydata, presence: true
+
+  def mandatory_json_values
+    json = JSON.parse(keydata)
+    ["private_key", "client_email"].each do |key|
+      errors.add(:keydata, "Keydata must contain value for #{key}!") unless json.has_key?(key)
+    end
+  end
 
   def api_client(scopes)
     scopes = scopes.split(" ") unless scopes.kind_of?(Array)
@@ -47,8 +55,8 @@ class Project < ActiveRecord::Base
     client
   end
 
-  def addable_users
-    User.all.select { |u| !(u.has_role?(:admin, self) || u.has_role?(:zone_manager, self)) }
+  def json_credentials?
+    return !!JSON.parse(keydata) rescue false
   end
 
 end

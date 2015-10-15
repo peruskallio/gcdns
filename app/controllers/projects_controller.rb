@@ -88,8 +88,12 @@ class ProjectsController < ApplicationController
     end
 
     def set_zones
-      GRemote::DnsModel.initialize_api(@project)
-      @zones = GRemote::Zone.list
+      begin
+        GRemote::DnsModel.initialize_api(@project)
+        @zones = GRemote::Zone.list
+      rescue
+        @zones_unavailable = true
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

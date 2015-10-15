@@ -9,15 +9,17 @@
 	  <%= @project.project_key %>
 	</p>
 
-	<p>
-	  <strong>Issuer:</strong>
-	  <%= @project.issuer %>
-	</p>
+	<% unless @project.json_credentials? %>
+		<p>
+		  <strong>Issuer:</strong>
+		  <%= @project.issuer %>
+		</p>
 
-	<p>
-	  <strong>Keypass:</strong>
-	  <%= @project.keypass %>
-	</p>
+		<p>
+		  <strong>Keypass:</strong>
+		  <%= @project.keypass %>
+		</p>
+	<% end %>
 <% end %>
 <% if policy(@project).edit? %>
 	<%= link_to 'Edit', edit_project_path(@project) %> |

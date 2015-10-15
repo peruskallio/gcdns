@@ -20,6 +20,7 @@
 //= require lib/chosen.jquery.min
 //= require_tree ./views
 //= require permissions
+//= require project-form
 //= require_self
 
 // Bind all the starting actions of a page to the "pageready"
@@ -33,4 +34,5 @@ $(document).on('ready page:load', function(ev) {
 	PathInitializer.load();
 	$('.permission-edit').permissionUI();
 	$('select.chosen').chosen();
+	$('.project-form').projectForm();
 });
