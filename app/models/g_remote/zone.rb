@@ -23,9 +23,7 @@ module GRemote
     end
 
     def soa_record
-      self.recordsets_by(name: self.dns_name, type: 'SOA').detect do |rset|
-        rset.name == self.dns_name && rset.type == 'SOA'
-      end
+      self.recordsets.detect { |rs| rs.type == "SOA" }
     end
 
     def update_soa(params={})

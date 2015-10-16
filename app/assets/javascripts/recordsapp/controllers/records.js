@@ -207,6 +207,7 @@ $(document).on('recordsapp:load', function() {
 					this._setRecordType('A');
 					this.set('isAdding', true);
 					this.set('recordTTL', this.get('defaultTTL'));
+					this.set('recordPermanent', false);
 				}
 			},
 
@@ -438,7 +439,6 @@ $(document).on('recordsapp:load', function() {
 
 						soaData[2] = currentDate + ((soaIncrement < 10 ? "0" : "") + soaIncrement);
 					}
-
 					soa.set('datas', [soaData.join(" ")]);
 				}
 
@@ -484,13 +484,15 @@ $(document).on('recordsapp:load', function() {
 						// Mark the items as "undirty" as we have now handeled their saving prorcess.
 						model.forEach(function(item) {
 							if (item.get('isDirty')) {
-								item.set('currentState.stateName', 'root.loaded.saved');
+								/*item.set('currentState.stateName', 'root.loaded.saved');
 
 								// These are private methods of the Model, no idea what they do...
 								item.adapterWillCommit();
 								item.adapterDidCommit();
 
-								item.set('currentState.isDirty', false);
+								item.set('currentState.isDirty', false);*/
+
+								item.save();
 							}
 						});
 
@@ -706,7 +708,6 @@ $(document).on('recordsapp:load', function() {
 						if (typeObject.value) {
 							for (var i=0; i < typeObject.value.length; i++) {
 								var key = typeObject.value[i];
-								console.log(key);
 								if (i > 0) {
 									value += " ";
 								}

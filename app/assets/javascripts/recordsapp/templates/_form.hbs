@@ -85,23 +85,21 @@
 				<label for="negative">Negative result TTL</label>
 				{{input id="negative" class="form-control" placeholder="Negative" value=recordNegative}}
 			</div>
-		{{/if}}
-
-			
-		<div class="data">
-			<label>Data</label>
-			<!-- Yo dawg! -->
-			<div class="well">
-				{{#each val in recordDataRows}}
-					<div class="data-row row-{{unbound _view.contentIndex}}">
-						<div>{{currentTime}}</div>
-						{{record-data index=_view.contentIndex errors=recordDataErrors record-type=recordType value=val update-action="updateDataRow" remove-action="removeDataRow"}}
-					</div>
-				{{/each}}
-				
-				<a href="#" class="btn btn-success" {{action "addDataRow" on="click"}}><span class="glyphicon glyphicon-plus-sign"></span></a>
+		{{else}}		
+			<div class="data">
+				<label>Data</label>
+				<!-- Yo dawg! -->
+				<div class="well">
+					{{#each val in recordDataRows}}
+						<div class="data-row row-{{unbound _view.contentIndex}}">
+							<div>{{currentTime}}</div>
+							{{record-data index=_view.contentIndex errors=recordDataErrors record-type=recordType value=val update-action="updateDataRow" remove-action="removeDataRow"}}
+						</div>
+					{{/each}}
+					
+					<a href="#" class="btn btn-success" {{action "addDataRow" on="click"}}><span class="glyphicon glyphicon-plus-sign"></span></a>
+				</div>
 			</div>
-		</div>
-
+		{{/if}}
 	</div>
 </div>

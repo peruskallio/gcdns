@@ -5,6 +5,14 @@
 
 class ZoneRecordsController < RemoteController
 
+  def create
+    render json: { }
+  end
+
+  def update
+    render json: { }
+  end
+
   # We want to return both the zone and the records for that zone
   # within the same request so that we can avoid calling the API
   # twice and thus, speeding up the whole fetching process.
