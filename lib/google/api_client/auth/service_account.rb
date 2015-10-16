@@ -27,9 +27,6 @@ module Google
           }
         end
         credentials.reverse_merge!(options)
-
-        puts credentials.to_yaml
-
         @authorization = Signet::OAuth2::Client.new(credentials)
       end
 
