@@ -485,15 +485,7 @@ $(document).on('recordsapp:load', function() {
 						// Mark the items as "undirty" as we have now handeled their saving prorcess.
 						model.forEach(function(item) {
 							if (item.get('isDirty')) {
-								/*item.set('currentState.stateName', 'root.loaded.saved');
-
-								// These are private methods of the Model, no idea what they do...
-								item.adapterWillCommit();
-								item.adapterDidCommit();
-
-								item.set('currentState.isDirty', false);*/
-
-								item.save();
+								item.clean();
 							}
 						});
 

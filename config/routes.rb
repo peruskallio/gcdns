@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     resources :permissions, only: [:create, :update, :destroy]
 
     resources :zones, except: [:update] do
-      resources :records, only: [:index, :update, :create], controller: 'zone_records'
+      resources :records, only: [:index], controller: 'zone_records'
       resources :changes, only: [:index, :show, :create], controller: 'zone_changes'
     end
 
