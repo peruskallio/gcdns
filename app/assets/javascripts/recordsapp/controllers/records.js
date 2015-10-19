@@ -315,6 +315,7 @@ $(document).on('recordsapp:load', function() {
 			editRecord: function(record) {
 				this._resetFields();
 				this._resetErrors();
+				this.set('isAdding', false);
 				this.set('isEditing', true);
 
 				var type = record.get('type');
