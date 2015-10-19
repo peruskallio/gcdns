@@ -21,30 +21,17 @@ class User < ActiveRecord::Base
     end
   end
 
-  def can_read_zone?(zone)
-    has_zone_permission?(zone, :read)
-  end
-
-  def can_edit_zone?(zone)
-    has_zone_permission?(zone, :edit)
-  end
-
-  def can_destroy_zone?(zone)
-    has_zone_permission?(zone, :destroy)
-  end
-
-  def create_permissions_for_new_zone(zone, project)
-    if has_role?(:zone_manager, project)
+  def create_permissions_for_new_zone(zone)
+    if has_role?(:zone_manager, zone.project)
       zone_permissions.create([
-        { zone_id: zone.id, project: project, name: :read },
-        { zone_id: zone.id, project: project, name: :edit },
-        { zone_id: zone.id, project: project, name: :destroy }
+        { zone_id: zone.id, project: zone.project, name: :read },
+        { zone_id: zone.id, project: zone.project, name: :edit },
+        { zone_id: zone.id, project: zone.project, name: :destroy }
       ])
     end
   end
 
-  private
-    def has_zone_permission?(zone, name)
-      zone_permissions.where(zone_id: zone.id, name: name).any?
-    end
+  def has_zone_permission?(zone, name)
+    zone_permissions.where(zone_id: zone.id, name: name).any?
+  end
 end

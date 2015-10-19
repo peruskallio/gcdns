@@ -15,8 +15,4 @@ class ProjectPolicy < ApplicationPolicy
     update?
   end
 
-  def create_zone?
-    user.has_role?(:admin, record) || (user.has_role?(:zone_manager, record) && user.has_role?(:zone_creator, record))
-  end
-
 end

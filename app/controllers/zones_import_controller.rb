@@ -160,7 +160,7 @@ class ZonesImportController < RemoteController
             zone.description = ""
             zone.dns_name = domain_dns
             zone.save
-            current_user.create_permissions_for_new_zone(zone, @project)
+            current_user.create_permissions_for_new_zone(zone)
           rescue Exception => e
             errors.push(e.message)
           end
@@ -287,7 +287,7 @@ class ZonesImportController < RemoteController
     end
 
     def authorize_project
-      authorize @project, :create_zone?
+      authorize GRemote::Zone.new, :create?
     end
 
 end

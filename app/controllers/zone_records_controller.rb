@@ -12,7 +12,7 @@ class ZoneRecordsController < RemoteController
     error = nil
     begin
       @zone = GRemote::Zone.find(params[:zone_id])
-      authorize(@zone, :show?) unless current_user.has_role?(:admin, @project)
+      authorize(@zone, :show?)
     rescue Exception => e
       error = e.message
     end

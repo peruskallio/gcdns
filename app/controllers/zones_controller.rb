@@ -15,25 +15,25 @@ class ZonesController < RemoteController
   def show
     zone = GRemote::Zone.new
     zone.id = params[:id]
-    authorize zone unless current_user.has_role?(:admin, @project)
-    @can_edit = current_user.has_role?(:admin, @project) || current_user.can_edit_zone?(zone)
+    authorize zone
+    @can_edit = policy(zone).edit?
   end
 
   def new
-    authorize @project, :create_zone?
+    authorize GRemote::Zone.new
   end
 
   # POST /projects/:project_id/zones
   def create
     error = nil
-    authorize @project, :create_zone?
+    @zone = GRemote::Zone.new
+    authorize @zone
     begin
-      @zone = GRemote::Zone.new
       @zone.name = params[:name]
       @zone.description = params[:description]
       @zone.dns_name = params[:dns_name]
       @zone.save
-      current_user.create_permissions_for_new_zone(@zone, @project)
+      current_user.create_permissions_for_new_zone(@zone)
     rescue Exception => e
       error = e.message
     end
@@ -61,7 +61,7 @@ class ZonesController < RemoteController
       # not necessary here.
       @zone = GRemote::Zone.new
       @zone.id = params[:id]
-      authorize @zone unless current_user.has_role? :admin, @project
+      authorize @zone
       @zone.delete
       ZonePermission.where(zone_id: params[:id]).destroy_all
     rescue Exception => e

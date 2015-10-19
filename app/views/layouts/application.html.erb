@@ -29,7 +29,7 @@
 			<ul class="nav navbar-nav">
 				<% if @project && !@project.new_record? %>
 				<%= nav_link "Zones", project_zones_path(@project) %>
-				<% if policy(@project).create_zone? %>
+				<% if policy(GRemote::Zone.new).create? %>
 				<%= nav_link "Import", project_import_index_path(@project) %>
 				<% end %>
 				<%= nav_link "Export", project_export_index_path(@project) %>

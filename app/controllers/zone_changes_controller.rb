@@ -8,7 +8,7 @@ class ZoneChangesController < RemoteController
   def index
     zone = GRemote::Zone.new
     zone.id = params[:zone_id]
-    authorize(zone, :show?) unless current_user.has_role?(:admin, @project)
+    authorize(zone, :show?)
     changes = GRemote::Changes.list(params[:zone_id])
 
     render json: {changes: changes}
@@ -17,7 +17,7 @@ class ZoneChangesController < RemoteController
   def show
     zone = GRemote::Zone.new
     zone.id = params[:zone_id]
-    authorize(zone, :show?) unless current_user.has_role?(:admin, @project)
+    authorize(zone, :show?)
     change = GRemote::Changes.find(params[:id], params[:zone_id])
 
     render json: {change: change}
@@ -29,7 +29,7 @@ class ZoneChangesController < RemoteController
       zone = GRemote::Zone.new
       zone.id = params[:zone_id]
 
-      authorize(zone, :edit?) unless current_user.has_role?(:admin, @project)
+      authorize(zone, :edit?)
 
       changerec = params[:change]
 

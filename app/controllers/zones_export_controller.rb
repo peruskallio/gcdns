@@ -185,12 +185,10 @@ class ZonesExportController < RemoteController
   private
 
     def authorize_zones(zones)
-      unless current_user.has_role?(:admin, @project)
-        zones.each do |zone_id|
-          zone = GRemote::Zone.new
-          zone.id = zone_id
-          authorize(zone, :show?)
-        end
+      zones.each do |zone_id|
+        zone = GRemote::Zone.new
+        zone.id = zone_id
+        authorize(zone, :show?)
       end
     end
 

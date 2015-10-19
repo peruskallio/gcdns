@@ -139,8 +139,8 @@
 													<input type="hidden" name="permissions[<%= zone.id %>][read]" value="on">
 												</td>
 												<td class="text-center"><input type="checkbox" checked disabled="disabled"></td>
-												<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][edit]" <%= user.can_edit_zone?(zone) ? 'checked' : '' %>/></td>
-												<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][destroy]" <%= user.can_destroy_zone?(zone) ? 'checked' : '' %>/></td>
+												<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][edit]" <%= user.has_zone_permission?(zone, :edit) ? 'checked' : '' %>/></td>
+												<td class="text-center"><input type="checkbox" name="permissions[<%= zone.id %>][destroy]" <%= user.has_zone_permission?(zone, :destroy) ? 'checked' : '' %>/></td>
 												<td><a class="remove-permission btn btn-xs btn-danger pull-right">&times;</a></td>
 											</tr>
 										<% end %>

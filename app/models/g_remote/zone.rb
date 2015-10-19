@@ -6,10 +6,23 @@
 module GRemote
   class Zone < DnsModel
 
-    attr_accessor :id, :name, :description, :dns_name
+    attr_accessor :id, :name, :description, :dns_name, :project_id
 
     def self.policy_class
       ZonePolicy
+    end
+
+    def initialize
+      super
+      @project_id = @@project.id rescue nil
+    end
+
+    def project
+      Project.find(@project_id)
+    end
+
+    def project=(project)
+      @project_id = project.id rescue nil
     end
 
     def recordsets
