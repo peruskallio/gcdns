@@ -1,6 +1,6 @@
 # GCDNS - UI for the Google Cloud DNS service
 
-This software provides a UI for the Google Cloud DNS service. It is designed to work with the current version of the API (October, 2014) which is v1beta1.
+This software provides a UI for the Google Cloud DNS service. It is designed to work with the current version of the API (October, 2015) which is v1.
 
 Written in Ruby on Rails. Part of the UI is built with Ember.js.
 
@@ -10,10 +10,7 @@ Provided by [Mainio Tech](http://www.mainiotech.fi/).
 ## Update November 2014
 
 As of November 2014, the [Google Cloud Developer Console](https://developers.google.com/console/help/new/) now also provides a UI for managing the records.
-Therefore, it is unlikely that this project will see any progress in the future.
-
-This will still be available here as a reference implementation or a way to import or export the records into the Cloud DNS platform as those features are
-not provided by the current version of the Developer Console DNS management UI.
+However, this project has some features that the Google Cloud DNS platform does not.
 
 
 ## Features
@@ -21,8 +18,9 @@ not provided by the current version of the Developer Console DNS management UI.
 * Attaching projects from the Google API console to be managed with this software
 * Managing the domain zones for the attached projects
 * Managing the DNS records of the zones
-* Importing DNS records from the bind zone format
-* Exporting DNS records to the bind zone format
+* User roles and permissions for project and zone level access (Not available in the Google Cloud DNS platform)
+* Importing DNS records from the bind zone format (Not available in the Google Cloud DNS platform)
+* Exporting DNS records to the bind zone format (Not available in the Google Cloud DNS platform)
 
 
 ## Requirements
@@ -65,7 +63,7 @@ https://cloud.google.com/dns/migrating-bind-differences
 
 ## Testing
 
-No tests are written for this project. Feel free to contribute.
+Only user permissions and zone export/import features are currently tested. Feel free to contribute.
 
 
 ## Notes
@@ -86,9 +84,8 @@ No tests are written for this project. Feel free to contribute.
 Some missing features which would be nice if someone wants to contribute to this project:
 
 * Default project on account-level (user is automatically redirected to this project after a successful login)
-* Tests would be nice
+* More tests would be nice (only user permissions and zone export/import functionalities are currently tested)
 * Support for UI translations (note: translating the API errors might be quite tricky as they are not documented anywhere...)
-* User roles and permissions for the project-level access.
 * Showing the changes backtrace for the zones (available through the API).
 * Showing pending changes for the zones (available through the API).
 * The UI could be optimized better for usability. It might be a bit hard to understand and use currently.
@@ -101,11 +98,13 @@ Please first create Git issues for any features you would like to work on so tha
 
 ## Future of This Project
 
-Google Cloud Developer console now provides a UI for managing the Cloud DNS records so it is unlikely that this project will be maintained.
+Google Cloud Developer console now provides a UI for managing the Cloud DNS records.
+However, this project provides some functionality that the current (October 2015) Cloud DNS UI does not.
 
-However, this project still acts as a good reference implementation on using the Cloud DNS API and also this provides some functionality that
-the current (November 2014) Cloud DNS UI does not. This functionality includes importing and exportign the DNS records in the BIND zone format.
-
+This functionality includes the following:
+* User roles and permissions for project and zone level access
+* Importing DNS records from the bind zone format
+* Exporting DNS records to the bind zone format
 
 ## Copyrights and License
 
