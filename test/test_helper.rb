@@ -24,4 +24,10 @@ class ActiveSupport::TestCase
       assert !options[:policy].send("#{key}?"), "#{options[:role]} should not be able to #{key} a #{options[:policy].record.class.to_s}"
     end
   end
+
+  def read_fixture(action)
+    cls = self.class.name.match("(.*)(?=Test)").to_s.underscore
+    IO.read(File.join(Rails.root, 'test', 'fixtures', cls, action))
+  end
+
 end

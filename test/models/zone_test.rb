@@ -75,6 +75,47 @@ class ZoneTest < ActiveSupport::TestCase
   end
 
   test "import" do
+    zone_string = read_fixture('import')
+    import = GRemote::Zone.import(zone_string, "zone.com.", "zone.com.")
+    zone = import[:zone]
+    dns_zone = import[:dns_zone]
+
+    assert_empty import[:errors], "Import had errors"
+    assert_equal dns_zone.ttl, "1", "Default TTL was not what was expected"
+
+    soa = dns_zone.records.detect { |r| r.type == "SOA" }
+    assert !soa.nil?, "SOA record was not found"
+    assert_equal soa.dump, "@ IN SOA ns-cloud-c1.googledomains.com. dns-admin.google.com. ( 1 21600 3600 1209600 300 )", "SOA record was not imported as expected"
+
+    4.times do |n|
+      ns = dns_zone.records.detect { |r| r.type == "NS" && r.dump == "@ IN NS ns-cloud-c#{n+1}.googledomains.com." }
+      assert !ns.nil?, "#{(n+1).ordinalize} NS record was not found"
+    end
+
+    checklist = {
+      "NS" => "ns.ns.",
+      "A" => "1.1.1.1",
+      "AAAA" => "2002:101:101::",
+      "CNAME" => "cname.cname.",
+      "MX" => "1 mx.mx.",
+      "PTR" => "ptr.ptr.",
+      "SPF" => "v=spf1-all",
+      "SRV" => "1 1 1 srv.srv.",
+      "TXT" => "txt",
+    }
+
+    import[:additions].each do |record|
+      type = record.type
+      assert !checklist[type].nil?, "Additions included an unexpected #{type}-record"
+
+      assert_equal record.name, "#{record.type.downcase}.zone.zone.", "Name was imported incorrectly for #{type}-record"
+      assert_equal record.ttl, "1", "TTL was imported incorrectly for #{type}-record"
+
+      assert_equal checklist[type], record.rrdatas.join(" "), "RRData was imported incorrectly for #{type}-record"
+      checklist.delete(type)
+    end
+
+    assert_empty checklist, "Not all records were imported"
   end
 
   private

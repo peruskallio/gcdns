@@ -172,6 +172,130 @@ module GRemote
       true
     end
 
+    def self.import(zone_string, domain, domain_dns)
+      # Load zone and read its data
+      errors = []
+      additions = []
+      zone_records = {}
+      num_records = 0
+
+      dns_zone = DNS::Zone.load(zone_string)
+
+      zone_origin = dns_zone.origin
+      zone_origin += "." unless zone_origin.ends_with?('.')
+
+      dns_zone.records.each do |rec|
+        data = nil
+
+        # Please note that we will ignore the SOA
+        # record and top level NS record intentionally!
+        if rec.is_a?(DNS::Zone::RR::NS) && !['@', zone_origin].include?(rec.label)
+          data = rec.nameserver
+        elsif rec.is_a?(DNS::Zone::RR::PTR)
+          data = rec.name
+        elsif rec.is_a?(DNS::Zone::RR::A)
+          data = rec.address
+        elsif rec.is_a?(DNS::Zone::RR::AAAA)
+          data = rec.address
+        elsif rec.is_a?(DNS::Zone::RR::CNAME)
+          data = hostname(rec.domainname, dns_zone.origin)
+        elsif rec.is_a?(DNS::Zone::RR::MX)
+          data = rec.priority.to_s + " " + hostname(rec.exchange, dns_zone.origin)
+        elsif rec.is_a?(DNS::Zone::RR::SPF)
+          data = rec.text
+        elsif rec.is_a?(DNS::Zone::RR::SRV)
+          data = rec.priority.to_s + " " + rec.weight.to_s + " " + rec.port.to_s + " " + hostname(rec.target, dns_zone.origin)
+        elsif rec.is_a?(DNS::Zone::RR::TXT)
+          data = rec.text.strip
+          if /\s/ =~ data
+            # If the data contains spaces, it needs to be enclosed in quotes.
+            # See: https://cloud.google.com/dns/what-is-cloud-dns#supported_record_types (TXT)
+            # "If one of your strings contains embedded white space, you must use the quoted form"
+            data = '"' + data + '"'
+          end
+        end
+
+        # We don't want to import empty data records because
+        # the Google DNS API does not like them (as it shouldn't).
+        if !data.nil? && data.strip.length > 0
+          # Default TTL is 24h (86400s) if it has not been set for the zone.
+          ttl = rec.ttl.nil? ? (dns_zone.ttl.nil? ? 21600 : dns_zone.ttl) : rec.ttl
+          ttl = ttl.to_s
+
+          name = rec.label
+          if name == '@'
+            name = zone_origin
+          else
+            name = hostname(name, dns_zone.origin)
+          end
+
+          zone_records[name] = {} unless zone_records[name]
+
+          datas = []
+          if zone_records[name][rec.type]
+            # The Google DNS API does not allow multiple records of the
+            # same type with the same name, so the additional records
+            # need to be set within the same zone
+            datas = zone_records[name][rec.type][:datas]
+          end
+          datas.push(data)
+
+          zone_records[name][rec.type] = {
+            :ttl => ttl,
+            :datas => datas
+          }
+          num_records += 1
+        end
+      end
+
+      if num_records > 0
+        # Create the remote zone
+        zone = GRemote::Zone.new
+        zone.name = domain.gsub(/[$!*()]/, '').gsub(/\.$/, '').gsub(/[._+]/, '-')
+        zone.description = ""
+        zone.dns_name = domain_dns
+
+        if errors.length < 1
+          # Add the records to a changes request and send it to the API.
+
+          zone_records.each do |name, typedatas|
+            typedatas.each do |type, details|
+
+              # Sort the datas before adding them to the RecordSet object.
+              # We want the MX and SRV records to be sorted by their priority
+              # as the first criteria.
+              datas = details[:datas].sort do |a, b|
+                if type == 'MX' || type == 'SRV'
+                  aparts = a.split(" ")
+                  bparts = b.split(" ")
+
+                  if aparts[0].to_i == bparts[0].to_i
+                    # Compare the MX/SRV record strings without the priority part
+                    aparts[1..-1].join(" ") <=> bparts[1..-1].join(" ")
+                  else
+                    # Compare the MX/SRV priorities if they are not equal
+                    aparts[0].to_i <=> bparts[0].to_i
+                  end
+                else
+                  a <=> b
+                end
+              end
+
+              rset = GRemote::RecordSet.new
+              rset.name = name
+              rset.type = type
+              rset.ttl = details[:ttl]
+              rset.rrdatas = datas
+              additions.push(rset)
+            end
+          end
+        end
+      else
+        errors.push("No records found for the zone.")
+      end
+      { errors: errors, additions: additions, zone: zone, dns_zone: dns_zone }
+    end
+
     def self.find(id_or_name)
       result = @@helper.api_call do |service|
         @@helper.api_request service.managed_zones.get, {
@@ -198,5 +322,19 @@ module GRemote
       zones
     end
 
+    private
+      def self.hostname(localname, zone_origin)
+        final = localname.strip
+
+        if final[-1, 1] != '.'
+          # Change short name into a full name. Google Clound DNS requires
+          # the domain names to be in their full format. Please see:
+          # https://cloud.google.com/dns/migrating-bind-differences
+          final += "." + zone_origin
+          final += "." unless /\.$/.match(zone_origin)
+        end
+
+        final
+      end
   end
 end

@@ -1,0 +1,27 @@
+;; ZONE: zone.zone. ;;
+$TTL 1
+$ORIGIN zone.zone.
+
+@       IN NS    ns-cloud-c1.googledomains.com.
+        IN NS    ns-cloud-c2.googledomains.com.
+        IN NS    ns-cloud-c3.googledomains.com.
+        IN NS    ns-cloud-c4.googledomains.com.
+        IN SOA   ns-cloud-c1.googledomains.com. dns-admin.google.com. 1 21600 3600 1209600 300
+
+a     1 IN A     1.1.1.1
+
+aaaa  1 IN AAAA  2002:101:101::
+
+cname 1 IN CNAME cname.cname.
+
+mx    1 IN MX    1 mx.mx.
+
+ns    1 IN NS    ns.ns.
+
+ptr   1 IN PTR   ptr.ptr.
+
+spf   1 IN SPF   "v=spf1" "-all"
+
+srv   1 IN SRV   1 1 1 srv.srv.
+
+txt   1 IN TXT   "txt"
