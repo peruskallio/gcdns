@@ -118,7 +118,49 @@ class ZoneTest < ActiveSupport::TestCase
     assert_empty checklist, "Not all records were imported"
   end
 
+  test "export" do
+    zone = GRemote::Zone.new
+    zone.name = "zone.zone."
+    zone.dns_name = "zone.zone."
+
+    rsets = []
+    ns_rrdatas = [
+      "ns-cloud-c1.googledomains.com.",
+      "ns-cloud-c2.googledomains.com.",
+      "ns-cloud-c3.googledomains.com.",
+      "ns-cloud-c4.googledomains.com."
+    ]
+
+    add_record_set(rsets, "NS", ns_rrdatas, "21600", "@")
+    add_record_set(rsets, "SOA", ["ns-cloud-c1.googledomains.com. dns-admin.google.com. 1 21600 3600 1209600 300"], "21600", "@")
+    add_record_set(rsets, "A", ["1.1.1.1"], "1")
+    add_record_set(rsets, "AAAA", ["2002:101:101::"], "1")
+    add_record_set(rsets, "CNAME", ["cname.cname."], "1")
+    add_record_set(rsets, "MX", ["1 mx.mx."], "1")
+    add_record_set(rsets, "NS", ["ns.ns."], "1")
+    add_record_set(rsets, "PTR", ["ptr.ptr."], "1")
+    add_record_set(rsets, "SPF", ["\"v=spf1\" \"-all\""], "1")
+    add_record_set(rsets, "SRV", ["1 1 1 srv.srv."], "1")
+    add_record_set(rsets, "TXT", ["\"txt\""], "1")
+
+    export = zone.export("21600", rsets)
+    compare = read_fixture('export')
+
+    assert_equal export, compare, "Export data did not match with the template"
+  end
+
   private
+
+    def add_record_set(arr, type, rrdatas, ttl, name=nil)
+      name ||= type.downcase
+      rec = GRemote::RecordSet.new
+      rec.type = type
+      rec.rrdatas = rrdatas
+      rec.name = name
+      rec.ttl = ttl
+      arr.push(rec)
+    end
+
     def zone_permission_test_vars
       u = User.first
       p = Project.first

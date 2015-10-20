@@ -45,93 +45,9 @@ class ZonesExportController < RemoteController
     authorize_zones(zones)
 
     if zones && zones.length > 0 && zones.include?(zone)
-      # Order the records in the following order.
-      record_order = ["SOA", "NS", "A", "AAAA", "CNAME", "MX", "SPF", "SRV", "TXT"]
-
       begin
-        zonefile = ""
         zone = GRemote::Zone.find(zone)
-
-        # First we want to sort the records properly
-        records = {}
-        names = []
-
-        lengths = {
-          name: 0,
-          ttl: 0,
-          type: 0
-        }
-
-        zone.recordsets.each do |rset|
-          rttl = rset.ttl.to_s
-          rttl = "" if rttl == ttl
-
-          name = rset.name
-          if name == zone.dns_name
-            # domain.com. => @
-            name = '@'
-          elsif name.end_with?("." + zone.dns_name)
-            # E.g. subdomain.domain.com. => subdomain
-            name = name[0, name.length - zone.dns_name.length - 1]
-          end
-
-          lengths[:name] = name.length if name.length > lengths[:name]
-          lengths[:ttl] = rttl.length if rttl.length > lengths[:ttl]
-          lengths[:type] = rset.type.length if rset.type.length > lengths[:type]
-
-          records[name] = {} unless records[name]
-          records[name][rset.type] = [] unless records[name][rset.type]
-
-          rset.rrdatas.each do |rdata|
-            records[name][rset.type].push({
-              ttl: rttl,
-              data: rdata
-            })
-          end
-
-          names.push(name) unless names.include?(name)
-        end
-
-        names.sort do |a, b|
-          if a != b
-            # '@' Comes always as the first one in the list
-            if a == '@'
-              -1
-            else # b == '@'
-              1
-            end
-          else
-            a <=> b
-          end
-        end
-
-        # After that, write the zone file.
-        # We want to create this manually because we want to format
-        # the zone file properly.
-        zonefile += "$TTL " + ttl
-        zonefile += "\n$ORIGIN " + zone.dns_name
-        zonefile += "\n"
-
-        names.each do |name|
-          recname = name
-          types = records[name].keys
-          types.sort do |a, b|
-            record_order.index(a) <=> record_order.index(b)
-          end
-          types.each do |type|
-            records[name][type].each do |rdata|
-              zonefile += "\n" + recname.ljust(lengths[:name], ' ')
-              zonefile += " " + rdata[:ttl].ljust(lengths[:ttl], ' ')
-              zonefile += " IN " + type.ljust(lengths[:type])
-              zonefile += " " + rdata[:data]
-
-              # Following lines with the same name do not need the name to be repeated
-              recname = ""
-            end
-          end
-          zonefile += "\n"
-        end
-
+        zonefile = zone.export(ttl)
         # Save zonefile
         data["zonefiles"][zone.dns_name] = zonefile
         save_data(data, data_id)

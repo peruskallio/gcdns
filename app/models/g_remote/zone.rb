@@ -172,6 +172,94 @@ module GRemote
       true
     end
 
+    def export(ttl, rsets=nil)
+      rsets ||= self.recordsets
+      # Order the records in the following order.
+      record_order = ["SOA", "NS", "A", "AAAA", "CNAME", "MX", "PTR", "SPF", "SRV", "TXT"]
+
+      zonefile = ""
+      # First we want to sort the records properly
+      records = {}
+      names = []
+
+      lengths = {
+        name: 0,
+        ttl: 0,
+        type: 0
+      }
+
+      rsets.each do |rset|
+        rttl = rset.ttl.to_s
+        rttl = "" if rttl == ttl
+
+        name = rset.name
+        if name == self.dns_name
+          # domain.com. => @
+          name = '@'
+        elsif name.end_with?("." + self.dns_name)
+          # E.g. subdomain.domain.com. => subdomain
+          name = name[0, name.length - self.dns_name.length - 1]
+        end
+
+        lengths[:name] = name.length if name.length > lengths[:name]
+        lengths[:ttl] = rttl.length if rttl.length > lengths[:ttl]
+        lengths[:type] = rset.type.length if rset.type.length > lengths[:type]
+
+        records[name] = {} unless records[name]
+        records[name][rset.type] = [] unless records[name][rset.type]
+
+        rset.rrdatas.each do |rdata|
+          records[name][rset.type].push({
+            ttl: rttl,
+            data: rdata
+          })
+        end
+
+        names.push(name) unless names.include?(name)
+      end
+
+      names.sort do |a, b|
+        if a != b
+          # '@' Comes always as the first one in the list
+          if a == '@'
+            -1
+          else # b == '@'
+            1
+          end
+        else
+          a <=> b
+        end
+      end
+
+      # After that, write the zone file.
+      # We want to create this manually because we want to format
+      # the zone file properly.
+      zonefile += "$TTL " + ttl
+      zonefile += "\n$ORIGIN " + self.dns_name
+      zonefile += "\n"
+
+      names.each do |name|
+        recname = name
+        types = records[name].keys
+        types.sort do |a, b|
+          record_order.index(a) <=> record_order.index(b)
+        end
+        types.each do |type|
+          records[name][type].each do |rdata|
+            zonefile += "\n" + recname.ljust(lengths[:name], ' ')
+            zonefile += " " + rdata[:ttl].ljust(lengths[:ttl], ' ')
+            zonefile += " IN " + type.ljust(lengths[:type])
+            zonefile += " " + rdata[:data]
+
+            # Following lines with the same name do not need the name to be repeated
+            recname = ""
+          end
+        end
+        zonefile += "\n"
+      end
+      zonefile
+    end
+
     def self.import(zone_string, domain, domain_dns)
       # Load zone and read its data
       errors = []
