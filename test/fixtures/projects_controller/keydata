@@ -1,0 +1,7 @@
+{
+  "private_key_id": "some id",
+  "private_key": "some private key",
+  "client_email": "some email",
+  "client_id": "some id",
+  "type": "service_account"
+}

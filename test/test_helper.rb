@@ -25,9 +25,18 @@ class ActiveSupport::TestCase
     end
   end
 
-  def read_fixture(action)
-    cls = self.class.name.match("(.*)(?=Test)").to_s.underscore
-    IO.read(File.join(Rails.root, 'test', 'fixtures', cls, action))
+  def fixture_upload(filename, type)
+    Rack::Test::UploadedFile.new(fixture_file_path(filename), type)
   end
+
+  def read_fixture(filename)
+    IO.read(fixture_file_path(filename))
+  end
+
+  private
+    def fixture_file_path(filename)
+      cls = self.class.name.match("(.*)(?=Test)").to_s.underscore
+      File.join(Rails.root, 'test', 'fixtures', cls, filename)
+    end
 
 end

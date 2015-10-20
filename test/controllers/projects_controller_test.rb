@@ -1,8 +1,13 @@
 require 'test_helper'
 
 class ProjectsControllerTest < ActionController::TestCase
+  include Devise::TestHelpers
+
   setup do
     @project = projects(:one)
+    u = User.first
+    u.add_role :admin, @project
+    sign_in u
   end
 
   test "should get index" do
@@ -18,7 +23,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "should create project" do
     assert_difference('Project.count') do
-      post :create, project: { issuer: @project.issuer, keydata: @project.keydata, keypass: @project.keypass }
+      post :create, project: { name: "New project", project_key: 'some-key', issuer: @project.issuer, keydata: fixture_upload("keydata", "application/json"), keypass: @project.keypass }
     end
 
     assert_redirected_to project_path(assigns(:project))
@@ -35,7 +40,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "should update project" do
-    patch :update, id: @project, project: { issuer: @project.issuer, keydata: @project.keydata, keypass: @project.keypass }
+    patch :update, id: @project, project: { issuer: @project.issuer, keydata: fixture_upload("keydata", "application/json"), keypass: @project.keypass }
     assert_redirected_to project_path(assigns(:project))
   end
 
@@ -44,6 +49,6 @@ class ProjectsControllerTest < ActionController::TestCase
       delete :destroy, id: @project
     end
 
-    assert_redirected_to projects_path
+    assert_redirected_to root_url
   end
 end

@@ -1,11 +1,15 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  name: One
   issuer: MyString
+  project_key: SomeKey
   keydata: MyText
   keypass: MyString
 
 two:
+  name: Two
   issuer: MyString
+  project_key: SomeKey
   keydata: MyText
   keypass: MyString
