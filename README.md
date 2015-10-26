@@ -18,6 +18,7 @@ However, this project has some features that the Google Cloud DNS platform does 
 * Attaching projects from the Google API console to be managed with this software
 * Managing the domain zones for the attached projects
 * Managing the DNS records of the zones
+* User management (CRUD) based on system level roles (System admin/user)
 * User roles and permissions for project and zone level access (Not available in the Google Cloud DNS platform)
 * Importing DNS records from the bind zone format (Not available in the Google Cloud DNS platform)
 * Exporting DNS records to the bind zone format (Not available in the Google Cloud DNS platform)
@@ -45,7 +46,7 @@ For starting up the development server, run `rails s`.
 
 ### Application Specific
 
-Create the initial user for using the software with the following rake command:
+Create the initial system admin for using the software with the following rake command:
 
 ```
 rake gcdns:create_user[email@address.com,password]
