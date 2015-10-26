@@ -48,6 +48,9 @@ var methods = {
             $el.append($cell);
         });
         $el.append('<td><a class="remove-permission btn btn-xs btn-danger pull-right">&times;</a></td>');
+        $('.remove-permission', $el).on('click', function(ev) {
+            $el.remove();
+        });
         return $el;
     }
 };
