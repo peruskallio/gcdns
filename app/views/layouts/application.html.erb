@@ -28,11 +28,15 @@
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<% if @project && !@project.new_record? %>
-				<%= nav_link "Zones", project_zones_path(@project) %>
-				<% if policy(GRemote::Zone.new).create? %>
-				<%= nav_link "Import", project_import_index_path(@project) %>
-				<% end %>
-				<%= nav_link "Export", project_export_index_path(@project) %>
+					<%= nav_link "Zones", project_zones_path(@project) %>
+					<%
+						new_zone = GRemote::Zone.new
+						new_zone.project = @project
+					%>
+					<% if policy(new_zone).create? %>
+					<%= nav_link "Import", project_import_index_path(@project) %>
+					<% end %>
+					<%= nav_link "Export", project_export_index_path(@project) %>
 				<% end %>
 			</ul>
 

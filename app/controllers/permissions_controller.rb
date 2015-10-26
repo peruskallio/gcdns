@@ -4,7 +4,9 @@ class PermissionsController < ApplicationController
   before_action :set_user
 
   def create
-    if @user.nil?
+    if @email_invalid
+      msg = { alert: "Invalid email." }
+    elsif @user.nil?
       msg = { alert: "User was not found." }
     elsif @project.roles.any? { |r| @user.has_role?(r.name, @project) }
       msg = { alert: "User is already added to the project." }
@@ -57,11 +59,38 @@ class PermissionsController < ApplicationController
 
     def set_user
       if params.has_key?(:email)
-        @user = User.find_by(email: params[:email])
+        if params[:email] =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+          @user = User.find_by(email: params[:email])
+        else
+          @email_invalid = true
+        end
       else
         @user = User.find(params[:id])
       end
-      redirect_to edit_project_path(@project), alert: "You can not edit your own credentials!" if @user == current_user
+      return redirect_to edit_project_path(@project), alert: "You can not edit your own credentials!" if @user == current_user
+
+      if !@email_invalid && @user.nil? && current_user.has_role?(:system_admin)
+        if params[:new_confirmed] && params[:new_confirmed] == "1"
+          pass = Devise.friendly_token.first(8)
+          @user = User.new(email: params[:email], password: pass, password_confirmation: pass)
+          if @user.save
+            @user.send_welcome_mail(current_user)
+          else
+            @email_invalid = true
+          end
+        else
+          @email = params[:email]
+          @name = params[:name]
+          if @name == "admin"
+            @role_name = "Admin"
+          elsif @name == "zone_manager"
+            @role_name = "Zone manager"
+          else
+            raise "Unknown role!"
+          end
+          return render "confirm_new_user"
+        end
+      end
     end
 
 end

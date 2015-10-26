@@ -1,0 +1,12 @@
+<h1>User was not found</h1>
+<p>Do you want to add a new user <strong><%= @email %></strong> with a role <strong><%= @role_name %></strong> for the project?</p>
+
+<%= form_tag project_permissions_path(@project), class: 'form form-inline' do %>
+	<%= hidden_field_tag :email, @email %>
+	<%= hidden_field_tag :name, @name %>
+	<%= hidden_field_tag :new_confirmed, "1" %>
+	<%= link_to "No", edit_project_path(id: @project.id), class: 'btn btn-default' %>
+	<%= submit_tag "Yes", class: 'btn btn-primary' %>
+<% end %>
+
+
