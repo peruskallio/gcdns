@@ -34,4 +34,9 @@ class User < ActiveRecord::Base
   def has_zone_permission?(zone, name)
     zone_permissions.where(zone_id: zone.id, name: name).any?
   end
+
+  def send_welcome_mail(adder)
+    token = set_reset_password_token
+    WelcomeMailer.added(adder, self, token).deliver
+  end
 end

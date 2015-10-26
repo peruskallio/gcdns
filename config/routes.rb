@@ -21,6 +21,8 @@ Rails.application.routes.draw do
 
   end
 
+  resources :system_users, except: [:new]
+
   # Allow only user editing but do not allow public registerations
   devise_for :users, path: "auth", skip: [:registrations], path_names: {
     sign_in: 'login',

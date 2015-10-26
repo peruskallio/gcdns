@@ -1,0 +1,3 @@
+<p><%= @adder.email %> has given you user access to GCDNS service.</p>
+<p>You need to set your password before you can log in to the service.</p>
+<p><%= link_to "Click here to set your password", edit_password_url(@added, reset_password_token: @token) %></p>

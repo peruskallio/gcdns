@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151013071632) do
+ActiveRecord::Schema.define(version: 20151026091547) do
 
   create_table "projects", force: true do |t|
     t.string   "issuer"

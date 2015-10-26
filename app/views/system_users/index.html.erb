@@ -1,0 +1,36 @@
+<h1>User management</h1>
+
+<h2>Users</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Email</th>
+			<th>Role</th>
+			<th></th>
+		</tr>
+	</thead>
+
+	<tbody>
+	<% @users.each do |user| %>
+		<tr>
+			<td><%= user.email %></td>
+			<td><%= user.has_role?(:system_admin) ? "System admin" : "User" %></td>
+			<td>
+				<div class="pull-right">
+					<% if current_user != user %>
+						<%= link_to "Edit", edit_system_user_path(id: user.id), class: "btn btn-xs btn-default" %>
+					<% else %>
+						<%= link_to "Edit my account", edit_user_registration_path, class: "btn btn-xs btn-default" %>
+					<% end %>
+				</div>
+			</td>
+		</tr>
+	<% end %>
+	</tbody>
+</table>
+
+<h2>Add user</h2>
+<%= form_tag system_users_path, class: 'form form-inline' do %>
+	<%= text_field_tag :email, "", placeholder: 'User email', class: 'form-control' %>
+	<%= submit_tag "Add user", class: 'btn btn-primary' %>
+<% end %>
