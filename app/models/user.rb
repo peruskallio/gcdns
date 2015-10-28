@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
     if self.has_role?(:admin, project)
       zones
     else
-      zones.select { |z| zone_permissions.where(zone_id: z.id, name: method).any? }
+      zones.select { |z| zone_permissions.where(zone_id: z.id, name: method, project: project.id).any? }
     end
   end
 
@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
   end
 
   def has_zone_permission?(zone, name)
-    zone_permissions.where(zone_id: zone.id, name: name).any?
+    zone_permissions.where(zone_id: zone.id, name: name, project_id: zone.project_id).any?
   end
 
   def send_welcome_mail(adder)
