@@ -65,7 +65,7 @@ class ZoneChangesController < RemoteController
         type: 'api_error',
         message: e.message
       }
-      raise e
+      # raise e
     end
 
     if error

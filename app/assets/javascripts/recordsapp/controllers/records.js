@@ -501,11 +501,18 @@ $(document).on('recordsapp:load', function() {
 						// that might have been made to the records and make sure that
 						// dirty records are not replaced with those that are returned
 						// by the server.
-					}, function(error) {
+					}, function(response) {
 						// Hide loader
 						self.set('isSaving', false);
 
-						console.log(error);
+                        var msg;
+                        try {
+                            msg = 'Save failed due to an error:\n\n' + response.responseJSON.error.message;
+                        } catch(e) {
+                            msg = "Save failed due to an unknown error!";
+                        }
+
+						alert(msg);
 
 						// TODO: Show the error for the user.
 						// Problem: how do we get the response data for fetching the error message?
