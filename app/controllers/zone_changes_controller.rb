@@ -61,9 +61,14 @@ class ZoneChangesController < RemoteController
         }
       end
     rescue Exception => e
+      if e.is_a? Pundit::NotAuthorizedError
+        msg = "Insufficient credentials!"
+      else
+        msg = e.message
+      end
       error = {
         type: 'api_error',
-        message: e.message
+        message: msg
       }
       # raise e
     end

@@ -505,17 +505,19 @@ $(document).on('recordsapp:load', function() {
 						// Hide loader
 						self.set('isSaving', false);
 
+                        var title = "Save failed due to an error!";
                         var msg;
                         try {
-                            msg = 'Save failed due to an error:\n\n' + response.responseJSON.error.message;
+                            msg = response.responseJSON.error.message;
                         } catch(e) {
-                            msg = "Save failed due to an unknown error!";
+                            msg = "Unknown error.";
                         }
 
-						alert(msg);
-
-						// TODO: Show the error for the user.
-						// Problem: how do we get the response data for fetching the error message?
+                        if ($.fn.createModal) {
+                            $.fn.createModal({ type: 'alert', title: title, message: msg });
+                        } else {
+                            alert(title + "\n\n" + msg);
+                        }
 					});
 				} else {
 					alert("No changes to be saved!");

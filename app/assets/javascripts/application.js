@@ -10,6 +10,7 @@
 //= require bootstrap/dropdown
 //= require bootstrap/collapse
 //= require bootstrap/transition
+//= require bootstrap/modal
 //= require nprogress
 //= require nprogress-turbolinks
 //= require jquery
@@ -20,6 +21,7 @@
 //= require lib/chosen.jquery.min
 //= require_tree ./views
 //= require permissions
+//= require create-modal
 //= require project-form
 //= require_self
 
