@@ -16,7 +16,7 @@
 		<tbody>
 		<% @zones.each do |zone| %>
 			<tr>
-				<td><%= link_to zone.id, project_zone_path(@project, zone.id) %></td>
+				<td><%= link_to zone.id, project_zone_path(@project, zone.id), data: { no_turbolink: true } %></td>
 				<td><%= zone.name %></td>
 				<td><%= zone.dns_name %></td>
 				<td><%= zone.description %></td>

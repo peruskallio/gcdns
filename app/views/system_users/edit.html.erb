@@ -1,0 +1,26 @@
+<h1>Edit user</h1>
+
+<%= form_for(@user, url: system_user_path(@user)) do |f| %>
+
+	<div class="form-group">
+		<%= f.label :email %>
+		<%= f.email_field :email, autofocus: true, class: "form-control" %>
+	</div>
+
+	<div class="form-group">
+		<%= f.label :system_admin do %>
+			<%= f.check_box :system_admin, checked: @user.has_role?(:system_admin) %>
+			System admin
+		<% end %>
+	</div>
+
+	<div>
+		<%= link_to "Cancel", system_users_path, class: "btn btn-default btn-lg" %>
+		<%= f.submit "Update", class: "btn btn-primary btn-lg" %>
+	</div>
+<% end %>
+
+<h3>Delete account</h3>
+
+<p>If you want to fully delete this account, click the link below:</p>
+<p><%= button_to "Delete account", system_user_path(@user), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-danger" %></p>
