@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.6'
+gem 'rails', '~> 4.2.7.1'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.3.10'
 # Use Uglifier as compressor for JavaScript assets
@@ -45,7 +45,7 @@ gem 'google-api-client'
 gem 'devise'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.3'
+gem 'sass-rails', '~> 4.0.5'
 # Bootstrap
 gem 'bootstrap-sass', '~> 3.2.0'
 # Autoprefixer recommeded by the bootstrap gem docs
