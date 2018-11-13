@@ -3,17 +3,17 @@
 		<strong>ID:</strong>
 		{{zone.id}}
 	</p>
-	
+
 	<p>
 		<strong>Name:</strong>
 		{{zone.name}}
 	</p>
-	
+
 	<p>
 		<strong>Description:</strong>
 		{{zone.description}}
 	</p>
-	
+
 	<p>
 		<strong>DNS name:</strong>
 		{{zone.dnsName}}
@@ -23,7 +23,7 @@
 {{#if changes}}
 <div id="changes">
 	<h2>Pending changes</h2>
-	
+
 	<ul>
 	{{#each changes}}
 		<li>{{startTime}}: {{status}} - {{additions}}, {{deletions}}</li>
@@ -34,12 +34,12 @@
 
 <div id="records">
 	<h2>Zone Records</h2>
-	
+
 	<p>Note: The lower you set the TTL values, the more queries your records produce to the Google DNS servers. Therefore, setting a low TTL will result in a bigger bill from Google.</p>
 	{{#if editAuthorativeEmailEnabled}}
 		{{#if editingAuthorativeEmail}}
 			<div class="form-inline" role="form">
-				<div class="form-group" {{bind-attr class=":form-group authorativeEmailError:has-error"}}>
+				<div class="form-group" class="form-group {{if authorativeEmailError "has-error"}}">
 					<label for="authorativeEmail">Authorative Email</label>
 					{{input id="authorativeEmail" class="form-control" type="email" placeholder="Enter Authorative Email" value=authorativeEmail}}
 				</div>
@@ -62,13 +62,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			{{#each record in controller}}
+			{{#each model as |record|}}
 				<tr>
 					<td>{{record.type}}</td>
 					<td>{{record.name}}</td>
 					<td>{{record.ttl}}</td>
 					<td class="datas">
-						{{#each data in record.datas}}
+						{{#each record.datas as |data|}}
 							{{data}}<br/>
 						{{/each}}
 					</td>
@@ -81,12 +81,12 @@
 			{{/each}}
 		</tbody>
 	</table>
-	
+
 	{{#if isFormVisible}}
 		<div id="record-adder" class="add-section">
 			<div class="well">
 				{{partial "form"}}
-				
+
 				<button class="btn btn-default btn-lg" {{action "toggleRecordForm" on="click"}}>Cancel</button>
 				{{#if isAdding}}
 				<button class="btn btn-success btn-lg" {{action "addRecord" on="click"}}>Add</button>
@@ -106,7 +106,7 @@
 
 {{#if canEdit}}
 <div>
-	<button class="btn btn-primary btn-lg pull-right" {{action "save"}} {{bind-attr disabled="isSaving"}}>Save</button>
+	<button class="btn btn-primary btn-lg pull-right" {{action "save"}} disabled={{isSaving}}>Save</button>
 </div>
 {{/if}}
 <div>

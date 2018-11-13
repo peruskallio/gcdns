@@ -7,23 +7,23 @@
 			These CAN be also modified through the Google DNS API but
 			they require special care so not sure whether these should
 			be allowed to change through this UI...
-			
+
 			The NS and SOA record changes are needed if the Google
 			DNS is used as a backup DNS service.
-			
+
 			And the PTR records requires setting the authorative
 			name servers of the IP to be the Google DNS servers that
 			serve that domain.
 		-->
-		<a href="#" {{action "toggleRecordType" "A" on="click"}} {{bind-attr class=":btn recordTypeA:btn-primary:btn-default"}}>A</a>
-		<a href="#" {{action "toggleRecordType" "AAAA" on="click"}} {{bind-attr class=":btn recordTypeAAAA:btn-primary:btn-default"}}>AAAA</a>
-		<a href="#" {{action "toggleRecordType" "NS" on="click"}} {{bind-attr class=":btn recordTypeNS:btn-primary:btn-default"}}>NS</a>
-		<a href="#" {{action "toggleRecordType" "CNAME" on="click"}} {{bind-attr class=":btn recordTypeCNAME:btn-primary:btn-default"}}>CNAME</a>
-		<a href="#" {{action "toggleRecordType" "MX" on="click"}} {{bind-attr class=":btn recordTypeMX:btn-primary:btn-default"}}>MX</a>
-		<a href="#" {{action "toggleRecordType" "SPF" on="click"}} {{bind-attr class=":btn recordTypeSPF:btn-primary:btn-default"}}>SPF</a>
-		<a href="#" {{action "toggleRecordType" "SRV" on="click"}} {{bind-attr class=":btn recordTypeSRV:btn-primary:btn-default"}}>SRV</a>
-		<a href="#" {{action "toggleRecordType" "TXT" on="click"}} {{bind-attr class=":btn recordTypeTXT:btn-primary:btn-default"}}>TXT</a>
-		<a href="#" {{action "toggleRecordType" "PTR" on="click"}} {{bind-attr class=":btn recordTypePTR:btn-primary:btn-default"}}>PTR</a>
+		<a href="#" {{action "toggleRecordType" "A" on="click"}} class="btn {{if recordTypeA "btn-primary" "btn-default"}}">A</a>
+		<a href="#" {{action "toggleRecordType" "AAAA" on="click"}} class="btn {{if recordTypeAAAA "btn-primary" "btn-default"}}">AAAA</a>
+		<a href="#" {{action "toggleRecordType" "NS" on="click"}} class="btn {{if recordTypeNS "btn-primary" "btn-default"}}">NS</a>
+		<a href="#" {{action "toggleRecordType" "CNAME" on="click"}} class="btn {{if recordTypeCNAME "btn-primary" "btn-default"}}">CNAME</a>
+		<a href="#" {{action "toggleRecordType" "MX" on="click"}} class="btn {{if recordTypeMX "btn-primary" "btn-default"}}">MX</a>
+		<a href="#" {{action "toggleRecordType" "SPF" on="click"}} class="btn {{if recordTypeSPF "btn-primary" "btn-default"}}">SPF</a>
+		<a href="#" {{action "toggleRecordType" "SRV" on="click"}} class="btn {{if recordTypeSRV "btn-primary" "btn-default"}}">SRV</a>
+		<a href="#" {{action "toggleRecordType" "TXT" on="click"}} class="btn {{if recordTypeTXT "btn-primary" "btn-default"}}">TXT</a>
+		<a href="#" {{action "toggleRecordType" "PTR" on="click"}} class="btn {{if recordTypePTR "btn-primary" "btn-default"}}">PTR</a>
 	</div>
 </div>
 {{/if}}
@@ -37,7 +37,7 @@
 <div class="errors">
 	<div class="alert alert-danger">
 		<ul>
-		{{#each err in recordErrors}}
+		{{#each recordErrors as |err|}}
 			<li>{{err}}</li>
 		{{/each}}
 		</ul>
@@ -47,56 +47,56 @@
 
 <div class="record-forms">
 	<div class="record">
-		<div {{bind-attr class=":form-group recordNameError:has-error"}}>
+		<div class="form-group {{if recordNameError "has-error"}}">
 			<label for="name">Name</label>
 			{{input id="name" class="form-control" placeholder="Name" value=recordName disabled=recordPermanent}}
 		</div>
-		<div {{bind-attr class=":form-group recordTTLError:has-error"}}>
+		<div class="form-group {{if recordTTLError "has-error"}}">
 			<label for="ttl">TTL</label>
 			{{input id="ttl" class="form-control" placeholder="TTL" value=recordTTL}}
 		</div>
 		{{#if recordTypeSOA}}
 
-			<div {{bind-attr class=":form-group recordPrimaryError:has-error"}}>
+			<div class="form-group {{if recordPrimaryError "has-error"}}">
 				<label for="primary">Primary name server</label>
 				{{input id="primary" class="form-control" placeholder="Primary" value=recordPrimary}}
 			</div>
-			<div {{bind-attr class=":form-group recordResponsibleError:has-error"}}>
+			<div class="form-group {{if recordResponsibleError "has-error"}}">
 				<label for="responsible">Authorative email</label>
 				{{input id="responsible" class="form-control" placeholder="Responsible party" value=recordResponsible}}
 			</div>
-			<div {{bind-attr class=":form-group recordVersionError:has-error"}}>
+			<div class="form-group {{if recordVersionError "has-error"}}">
 				<label for="version">Version (will be incremented automatically after save)</label>
 				{{input id="version" class="form-control" placeholder="Retry" value=recordVersion disabled="disabled"}}
 			</div>
-			<div {{bind-attr class=":form-group recordRefreshError:has-error"}}>
+			<div class="form-group {{if recordRefreshError "has-error"}}">
 				<label for="refresh">Seconds before the zone should be refreshed</label>
 				{{input id="refresh" class="form-control" placeholder="Refresh" value=recordRefresh}}
 			</div>
-			<div {{bind-attr class=":form-group recordRetryError:has-error"}}>
+			<div class="form-group {{if recordRetryError "has-error"}}">
 				<label for="retry">Seconds before a failed refresh should be retried</label>
 				{{input id="retry" class="form-control" placeholder="Retry" value=recordRetry}}
 			</div>
-			<div {{bind-attr class=":form-group recordTimeoutError:has-error"}}>
+			<div class="form-group {{if recordTimeoutError "has-error"}}">
 				<label for="timeout">Seconds before a zone is considered no longer authoritative.</label>
 				{{input id="timeout" class="form-control" placeholder="Timeout" value=recordTimeout}}
 			</div>
-			<div {{bind-attr class=":form-group recordNegativeError:has-error"}}>
+			<div class="form-group {{if recordNegativeError "has-error"}}">
 				<label for="negative">Negative result TTL</label>
 				{{input id="negative" class="form-control" placeholder="Negative" value=recordNegative}}
 			</div>
-		{{else}}		
+		{{else}}
 			<div class="data">
 				<label>Data</label>
 				<!-- Yo dawg! -->
 				<div class="well">
-					{{#each val in recordDataRows}}
+					{{#each recordDataRows as |val|}}
 						<div class="data-row row-{{unbound _view.contentIndex}}">
 							<div>{{currentTime}}</div>
 							{{record-data index=_view.contentIndex errors=recordDataErrors record-type=recordType value=val update-action="updateDataRow" remove-action="removeDataRow"}}
 						</div>
 					{{/each}}
-					
+
 					<a href="#" class="btn btn-success" {{action "addDataRow" on="click"}}><span class="glyphicon glyphicon-plus-sign"></span></a>
 				</div>
 			</div>

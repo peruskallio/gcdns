@@ -2,45 +2,45 @@
 	{{#if canDelete}}
 	<a href="#" class="btn btn-danger pull-right" {{action "removeRow"}}><span class="glyphicon glyphicon-minus-sign"></span></a>
 	{{/if}}
-	
+
 	<h4>Record #{{dataIndex}}</h4>
 </div>
 {{#if recordTypeDefault}}
-	<div {{bind-attr class=":form-group recordValueError:has-error"}}>
+	<div class="form-group {{if recordValueError "has-error"}}">
 		<label for="{{valueIdAttribute}}">{{dataName}}</label>
 		{{input id=valueIdAttribute class="form-control" placeholder=dataName value=recordValue}}
 	</div>
 {{else}}
 	{{#if recordTypeMX}}
-	<div {{bind-attr class=":form-group recordValueHostnameError:has-error"}}>
+	<div class="form-group {{if recordValueHostnameError "has-error"}}">
 		<label for="{{valueIdAttributeHostname}}">Hostname</label>
 		{{input id=valueIdAttributeHostname class="form-control" placeholder="Hostname" value=recordValueHostname}}
 	</div>
-	<div {{bind-attr class=":form-group recordValuePriorityError:has-error"}}>
+	<div class="form-group {{if recordValuePriorityError "has-error"}}">
 		<label for="{{valueIdAttributePriority}}">Priority</label>
 		{{input id=valueIdAttributePriority class="form-control" placeholder="Priority" value=recordValuePriority}}
 	</div>
 	{{/if}}
 	{{#if recordTypeSRV}}
-	<div {{bind-attr class=":form-group recordValueTargetError:has-error"}}>
+	<div class="form-group {{if recordValueTargetError "has-error"}}">
 		<label for="{{valueIdAttributeTarget}}">Target</label>
 		{{input id=valueIdAttributeTarget class="form-control" placeholder="Target" value=recordValueTarget}}
 	</div>
-	<div {{bind-attr class=":form-group recordValuePortError:has-error"}}>
+	<div class="form-group {{if recordValuePortError "has-error"}}">
 		<label for="{{valueIdAttributePort}}">Port</label>
 		{{input id=valueIdAttributePort class="form-control" placeholder="Port" value=recordValuePort}}
 	</div>
-	<div {{bind-attr class=":form-group recordValuePriorityError:has-error"}}>
+	<div class="form-group {{if recordValuePriorityError "has-error"}}">
 		<label for="{{valueIdAttributePriority}}">Priority</label>
 		{{input id=valueIdAttributePriority class="form-control" placeholder="Priority" value=recordValuePriority}}
 	</div>
-	<div {{bind-attr class=":form-group recordValueWeightError:has-error"}}>
+	<div class="form-group {{if recordValueWeightError "has-error"}}">
 		<label for="{{valueIdAttributeWeight}}">Weight</label>
 		{{input id=valueIdAttributeWeight class="form-control" placeholder="Weight" value=recordValueWeight}}
 	</div>
 	{{/if}}
 	{{#if recordTypeTXT}}
-	<div {{bind-attr class=":form-group recordValueError:has-error"}}>
+	<div class="form-group {{if recordValueError "has-error"}}">
 		<label for="{{valueIdAttribute}}">Text</label>
 		{{textarea id=valueIdAttribute name="value" class="form-control" placeholder="Text" rows="3" value=recordValue}}
 	</div>

@@ -14,7 +14,6 @@
 //= require nprogress
 //= require nprogress-turbolinks
 //= require jquery
-//= require handlebars
 //= require ember
 //= require ember-data
 //= require lib/path_initializer
@@ -27,7 +26,7 @@
 
 // Bind all the starting actions of a page to the "pageready"
 // event so that we don't need to repeat both events each time.
-$(document).on('ready page:load', function(ev) {
+$(document).on('turbolinks:load', function(ev) {
 	var args = Array.prototype.slice.call(arguments);
 	ev.originalType = ev.type;
 	ev.type = "pageready";

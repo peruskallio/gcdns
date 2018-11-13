@@ -17,7 +17,7 @@ $(document).on('recordsapp:load', function() {
 	var numberRegex = /^[1-9][0-9]*$/;
 	var numberRegexLeadingZero = /^[0-9]*$/;
 
-	RecordsApp.RecordsController = Ember.ArrayController.extend({
+	RecordsApp.RecordsController = Ember.Controller.extend({
 
 		sortProperties: ['name'], // Also check out the orderBy function override.
 
@@ -405,7 +405,7 @@ $(document).on('recordsapp:load', function() {
 				});
 
 				var hasChanges = model.any(function(item) {
-					return item.get('isDirty');
+					return item.get('hasDirtyAttributes');
 				});
 				if (hasChanges) {
 					// Update the SOA record if some item has changed
@@ -446,7 +446,7 @@ $(document).on('recordsapp:load', function() {
 				model.forEach(function(item) {
 					if (item.get('isNew')) {
 						changes.get('additions').pushObject(item.toJSON());
-					} else if (item.get('isDirty')) {
+					} else if (item.get('hasDirtyAttributes')) {
 						var attrs = item.changedAttributes();
 						var del = {};
 						var add = {};
@@ -484,7 +484,7 @@ $(document).on('recordsapp:load', function() {
 					changes.save().then(function() {
 						// Mark the items as "undirty" as we have now handeled their saving prorcess.
 						model.forEach(function(item) {
-							if (item.get('isDirty')) {
+							if (item.get('hasDirtyAttributes')) {
 								item.clean();
 							}
 						});
@@ -526,7 +526,7 @@ $(document).on('recordsapp:load', function() {
 
 			exit: function() {
 				var unsavedChanges = this.get('model').any(function(item) {
-					return item.get('isDirty');
+					return item.get('hasDirtyAttributes');
 				});
 				var proceed = function() {
 					var path = RecordsApp.get('backUrl');
