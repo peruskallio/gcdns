@@ -245,6 +245,7 @@ DEPENDENCIES
   google-api-client (~> 0.8.7)
   jbuilder (~> 2.0)
   jquery-rails (~> 3.1.5)
+  nokogiri (>= 1.8.5)
   nprogress-rails
   pundit (~> 1.0.1)
   rails (~> 4.2.11)
