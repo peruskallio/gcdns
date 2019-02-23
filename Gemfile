@@ -48,7 +48,7 @@ gem 'devise'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.5'
 # Bootstrap
-gem 'bootstrap-sass', '~> 3.2.0'
+gem 'bootstrap-sass', '~> 3.4.1'
 # Autoprefixer recommeded by the bootstrap gem docs
 gem 'autoprefixer-rails'
 
